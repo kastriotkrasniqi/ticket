@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API\V1;
 
-use App\Models\Event;
+use App\Models\Ticket;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
-class EventController extends Controller
+class TicketController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -26,7 +27,7 @@ class EventController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Event $event)
+    public function show(Ticket $ticket)
     {
         //
     }
@@ -34,7 +35,7 @@ class EventController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Event $event)
+    public function update(Request $request, Ticket $ticket)
     {
         //
     }
@@ -42,7 +43,7 @@ class EventController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Event $event)
+    public function destroy(Ticket $ticket)
     {
         //
     }

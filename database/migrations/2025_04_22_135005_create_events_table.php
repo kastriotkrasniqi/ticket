@@ -21,7 +21,7 @@ return new class extends Migration
             $table->integer('total_tickets');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('image')->nullable();
-            $table->boolean('is_canceleld')->nullable();
+            $table->boolean('is_canceled')->nullable();
             $table->timestamps();
         });
     }

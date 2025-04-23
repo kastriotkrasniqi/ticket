@@ -31,4 +31,9 @@ class Event extends Model
     {
         return $this->hasMany(Ticket::class);
     }
+
+    public function hasEnoughTickets(): bool
+    {
+        return $this->tickets()->count() < $this->total_tickets;
+    }
 }
