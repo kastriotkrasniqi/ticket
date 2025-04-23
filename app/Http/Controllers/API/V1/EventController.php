@@ -13,12 +13,14 @@ class EventController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $events = EventResource::collection(Event::with(['user', 'tickets'])->paginate(10));
+        $perPage = $request->query('perPage', 5);
+        $events = EventResource::collection(Event::paginate(perPage:$perPage));
 
         return Inertia::render('Events/Index', [
-            'events' => $events,
+            'events' => Inertia::merge(fn() => $events),
+            'perPage' => $perPage,
         ]);
     }
 
