@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\API\V1;
 
+use App\Http\Resources\EventResource;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Inertia\Inertia;
 
 class EventController extends Controller
 {
@@ -13,7 +15,11 @@ class EventController extends Controller
      */
     public function index()
     {
-        //
+        $events = EventResource::collection(Event::with(['user', 'tickets'])->paginate(10));
+
+        return Inertia::render('Events/Index', [
+            'events' => $events,
+        ]);
     }
 
     /**

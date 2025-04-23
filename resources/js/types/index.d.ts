@@ -41,3 +41,29 @@ export interface User {
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }
+
+
+export type Event  = {
+    id: number;
+    name: string;
+    description: string;
+    location: string;
+    date: number;
+    humanDate: string;
+    price: number;
+    total_tickets: number;
+    image: string | null;
+    is_canceled: boolean | null;
+    user_id: number;
+    created_at: string;
+    updated_at: string;
+    user: User;
+    remaining_tickets: number;
+}
+
+
+export type PaginatedResponse<T> = {
+    data: T[];
+    links: Record<string, any>;
+    meta: Record<string, any>;
+  };
