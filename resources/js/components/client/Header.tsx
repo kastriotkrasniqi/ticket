@@ -1,66 +1,85 @@
-import { Link } from '@inertiajs/react';
-import SearchBar from "./SearchBar";
-import { usePage } from '@inertiajs/react';
-import { type SharedData } from '@/types';
-import { useState } from 'react';
+import {Link} from "@inertiajs/react"
+import { Search } from "lucide-react"
 
-function Header() {
-  const { auth } = usePage<SharedData>().props;
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
-  const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
-
+export function Header() {
   return (
-    <div className="border-b">
-      <div className="flex flex-col items-center gap-4 p-4 lg:flex-row">
-        {/* Logo */}
-        <div className="flex w-full items-center justify-between lg:w-auto">
-          <Link href="/" className="shrink-0 font-bold">
-            <img src="/images/logo.png" alt="logo" width={100} height={100} className="w-24 lg:w-28" />
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="flex h-16 items-center justify-between px-4 md:px-6">
+        <div className="flex items-center gap-2 md:gap-4">
+          <Link href="/" className="flex items-center space-x-2">
+            <span className="text-xl font-bold">TicketHub</span>
           </Link>
         </div>
 
-        {/* Search Bar */}
-        <div className="w-full lg:max-w-2xl">
-          <SearchBar />
+        <div className="relative w-full max-w-sm mx-4 md:mx-8 lg:mx-12">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="search"
+            placeholder="Search for events..."
+            className="w-full appearance-none bg-background pl-8 shadow-none"
+          />
         </div>
 
-        {/* Dropdown User Menu */}
-        {auth.user && (
-          <div className="relative ml-auto hidden lg:block">
-            <button
-              onClick={toggleDropdown}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-gray-100 rounded-lg hover:bg-gray-200 transition"
-            >
-              {auth.user.name}
-              <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.586l3.71-4.356a.75.75 0 111.14.976l-4.25 5a.75.75 0 01-1.14 0l-4.25-5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
-              </svg>
-            </button>
+        <div className="flex items-center  gap-2 ml-auto">
+          <div className="hidden md:flex md:gap-2">
+            <Button variant="ghost" asChild>
+              <Link href="/my-tickets">My Tickets</Link>
+            </Button>
+            <Button variant="default" asChild>
+              <Link href="/sell-tickets">Sell Tickets</Link>
+            </Button>
+          </div>
 
-            {dropdownOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md z-50 border">
-                <Link
-                  href="/profile"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                >
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="rounded-full">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src="/placeholder.svg" alt="User" />
+                  <AvatarFallback>U</AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <Link href="/profile" className="flex w-full">
                   Profile
                 </Link>
-                <Link
-                  href="/logout"
-                  method="post"
-                  as="button"
-                  className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-                >
-                  Log Out
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link href="/settings" className="flex w-full">
+                  Settings
                 </Link>
-              </div>
-            )}
-          </div>
-        )}
+              </DropdownMenuItem>
+              <DropdownMenuItem className="md:hidden">
+                <Link href="/my-tickets" className="flex w-full ">
+                  My Tickets
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="md:hidden">
+                <Link href="/sell-tickets" className="flex w-full ">
+                  Sell Tickets
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>Log out</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
-    </div>
-  );
+    </header>
+  )
 }
-
-export default Header;

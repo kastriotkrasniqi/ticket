@@ -22,6 +22,18 @@ class Event extends Model
         'is_canceled',
     ];
 
+        /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'is_canceled' => 'boolean',
+        ];
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -32,10 +44,6 @@ class Event extends Model
         return $this->hasMany(Ticket::class, 'event_id');
     }
 
-    public function hasEnoughTickets(): bool
-    {
-        return $this->tickets()->count() < $this->total_tickets;
-    }
 
     public function purchasedCount(): int
     {
@@ -47,7 +55,6 @@ class Event extends Model
             ->count();
     }
 
-
     public function activeOffers(): int
     {
         return $this->tickets()->where('status', 'offered')->count();
@@ -56,6 +63,11 @@ class Event extends Model
     public function availableSpots(): int
     {
         return $this->total_tickets - ($this->purchasedCount() + $this->activeOffers());
+    }
+
+    public function isAvailable(): bool
+    {
+        return $this->availableSpots() > 0;
     }
 
 }

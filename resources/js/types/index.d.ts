@@ -43,27 +43,25 @@ export interface User {
 }
 
 
-export type Event  = {
-    id: number;
-    name: string;
-    description: string;
-    location: string;
-    date: number;
-    humanDate: string;
-    price: number;
-    total_tickets: number;
-    image: string | null;
-    is_canceled: boolean | null;
-    user_id: number;
-    created_at: string;
-    updated_at: string;
-    user: User;
-    remaining_tickets: number;
-}
-
-
 export type PaginatedResponse<T> = {
     data: T[];
     links: Record<string, any>;
     meta: Record<string, any>;
   };
+
+
+  export interface Event {
+    id: string
+    name: string
+    description: string
+    location: string
+    date: string
+    humanDate: string
+    price: number
+    total_tickets: number
+    sold_tickets?: number
+    user_id: string
+    image: string
+    is_canceled: boolean
+    remaining_tickets: number
+  }

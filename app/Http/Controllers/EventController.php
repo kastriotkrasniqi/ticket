@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\API\V1;
+namespace App\Http\Controllers;
 
 use App\Http\Resources\EventResource;
 use App\Models\Event;
+use App\Models\WaitingListEntry;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Inertia\Inertia;
@@ -16,7 +17,7 @@ class EventController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->query('perPage', 5);
-        $events = EventResource::collection(Event::paginate(perPage:$perPage));
+        $events = EventResource::collection(Event::paginate(perPage: $perPage));
 
         return Inertia::render('Events/Index', [
             'events' => Inertia::merge(fn() => $events),
@@ -29,15 +30,19 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Event $event)
+    public function show($id)
     {
-        //
+        $event = Event::findOrFail($id);
+
+        return Inertia::render('Events/Show', [
+            'event' => new EventResource($event),
+        ]);
     }
 
     /**
@@ -55,4 +60,5 @@ class EventController extends Controller
     {
         //
     }
+
 }
