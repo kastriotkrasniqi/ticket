@@ -1,10 +1,12 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\EventController;
+use App\Http\Controllers\TicketController;
 
 Route::get('/', function () {
-    return Inertia::render('welcome');
+    return redirect('events');
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -13,9 +15,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 });
 
-Route::get('client-home', function () {
-    return Inertia::render('client/home');
-})->name('client-home');
+
+Route::resource('events', EventController::class);
+Route::post('events/{event}/join-waiting-list', [EventController::class, 'joinWaitingList'])
+    ->name('events.join-waiting-list')
+    ->middleware('throttle:waiting-list-limiter');
+
+
+Route::resource('tickets', TicketController::class);
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

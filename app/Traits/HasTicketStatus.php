@@ -2,97 +2,99 @@
 
 namespace App\Traits;
 
+use App\Enums\TicketStatus;
+
 trait HasTicketStatus
 {
     public function isValid()
     {
-        return $this->status === 'valid';
+        return $this->status === TicketStatus::VALID;
     }
 
     public function isUsed()
     {
-        return $this->status === 'used';
+        return $this->status === TicketStatus::USED;;
     }
 
     public function isRefunded()
     {
-        return $this->status === 'refunded';
+        return $this->status === TicketStatus::REFUNDED;;
     }
 
     public function isCancelled()
     {
-        return $this->status === 'cancelled';
+        return $this->status === TicketStatus::CANCELLED;
     }
 
     public function markAsUsed()
     {
-        $this->status = 'used';
+        $this->status =  TicketStatus::USED;
         $this->save();
     }
 
     public function markAsRefunded()
     {
-        $this->status = 'refunded';
+        $this->status =  TicketStatus::REFUNDED;
         $this->save();
     }
 
     public function markAsCancelled()
     {
-        $this->status = 'cancelled';
+        $this->status =  TicketStatus::CANCELLED;
         $this->save();
     }
 
     public function markAsValid()
     {
-        $this->status = 'valid';
+        $this->status =  TicketStatus::VALID;
         $this->save();
     }
 
     public function markAsRefundedAndUpdateAmount($amount)
     {
-        $this->status = 'refunded';
+        $this->status =  TicketStatus::REFUNDED;
         $this->amount = $amount;
         $this->save();
     }
 
     public function markAsCancelledAndUpdateAmount($amount)
     {
-        $this->status = 'cancelled';
+        $this->status = TicketStatus::CANCELLED;
         $this->amount = $amount;
         $this->save();
     }
 
     public function markAsValidAndUpdateAmount($amount)
     {
-        $this->status = 'valid';
+        $this->status = TicketStatus::VALID;
         $this->amount = $amount;
         $this->save();
     }
 
     public function markAsUsedAndUpdateAmount($amount)
     {
-        $this->status = 'used';
+        $this->status = TicketStatus::USED;
         $this->amount = $amount;
         $this->save();
     }
 
     public function markAsValidAndUpdatePaymentIntentId($paymentIntentId)
     {
-        $this->status = 'valid';
+        $this->status = TicketStatus::VALID;
         $this->payment_intent_id = $paymentIntentId;
         $this->save();
     }
 
     public function markAsUsedAndUpdatePaymentIntentId($paymentIntentId)
     {
-        $this->status = 'used';
+        $this->status = TicketStatus::USED;
         $this->payment_intent_id = $paymentIntentId;
         $this->save();
     }
 
     public function markAsRefundedAndUpdatePaymentIntentId($paymentIntentId)
     {
-        $this->status = 'refunded';
+        $this->status = TicketStatus::REFUNDED;
         $this->payment_intent_id = $paymentIntentId;
         $this->save();
     }

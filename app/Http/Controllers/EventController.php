@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\WaitingStatus;
 use App\Http\Resources\EventResource;
+use App\Jobs\JoinWaitingList;
 use App\Models\Event;
 use App\Models\WaitingListEntry;
 use Illuminate\Http\Request;
@@ -59,6 +61,33 @@ class EventController extends Controller
     public function destroy(Event $event)
     {
         //
+    }
+
+
+    public function joinWaitingList($eventId)
+    {
+        $event = Event::findOrFail($eventId);
+        $avaialble = $event->availableSpots() > 0;
+
+        if($event->existingEntry(auth()->user())) {
+            return response()->json(['message' => 'You are already on the waiting list'], 422);
+        }
+
+
+
+        if(!$avaialble) {
+            return response()->json(['message' => 'No available spots'], 422);
+        }
+
+        JoinWaitingList::dispatch($event, auth()->user());
+
+        return response()->json(
+            [
+                'success' => true,
+                'status' => $avaialble > 0 ? WaitingStatus::OFFERED : WaitingStatus::WAITING,
+                'message' => $avaialble > 0 ? "Ticket offered - you have 15 minutes to purchase" : "Added to waiting list - you'll be notified when a ticket becomes available",
+            ]
+        );
     }
 
 }

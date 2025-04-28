@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Enums\WaitingStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class WaitingListEntry extends Model
 {
     protected $table = 'waiting_list';
+
+    const OFFER_EXPIRE_MINUTES = 15; // minutes
 
     protected $fillable = [
         'event_id',
@@ -17,7 +20,7 @@ class WaitingListEntry extends Model
     ];
 
     protected $casts = [
-        'expires_at' => 'datetime',
+        'status' => WaitingStatus::class
     ];
 
     public function event(): BelongsTo
@@ -34,4 +37,5 @@ class WaitingListEntry extends Model
     {
         return $this->expires_at && $this->expires_at->isPast();
     }
+
 }

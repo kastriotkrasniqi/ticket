@@ -6,13 +6,14 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/client/app-layout';
-import { type Event } from '@/types';
-import { Head } from '@inertiajs/react';
+import { SharedData, type Event } from '@/types';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { AlertCircleIcon, ArrowLeftIcon, CalendarIcon, MapPinIcon, TicketIcon, UserIcon } from 'lucide-react';
-import { useState } from 'react';
+import { JoinQueue } from '@/components/client/JoinQueue';
 
 export default function Show({ event }: { event: Event }) {
-    const isAvailable = !event.is_canceled && event.remaining_tickets > 0;
+    const isAvailable = !event.is_canceled && event.available_spots > 0;
+    const { auth } = usePage<SharedData>().props;
 
     return (
         <AppLayout>
@@ -99,7 +100,7 @@ export default function Show({ event }: { event: Event }) {
                                         <CalendarIcon className="text-muted-foreground mt-0.5 mr-2 h-5 w-5" />
                                         <div>
                                             <p className="font-medium">Date and Time</p>
-                                            <p className="text-muted-foreground">{event.date}</p>
+                                            <p className="text-muted-foreground">{event.humanDate}</p>
                                         </div>
                                     </div>
 
@@ -122,7 +123,7 @@ export default function Show({ event }: { event: Event }) {
                                     <div className="flex items-center">
                                         <TicketIcon className="text-muted-foreground mr-2 h-5 w-5" />
                                         {isAvailable ? (
-                                            <p>{event.remaining_tickets} tickets available</p>
+                                            <p>{event.available_spots} tickets available</p>
                                         ) : (
                                             <p className="text-destructive font-medium">Not available</p>
                                         )}
@@ -131,28 +132,8 @@ export default function Show({ event }: { event: Event }) {
                                     <Separator />
 
                                     {/* Ticket Purchase */}
-                                    {isAvailable && (
-                                        <div className="space-y-4">
-                                            <div className="flex items-center font-bold">
-                                                <p>Total</p>
-                                                <p className="ml-auto">${event.price.toFixed(2)}</p>
-                                            </div>
+                                    <JoinQueue event={event} />
 
-                                            <Button className="w-full">Buy Ticket</Button>
-                                        </div>
-                                    )}
-
-                                    {event.is_canceled && (
-                                        <div className="py-2 text-center">
-                                            <Badge variant="destructive">Event Canceled</Badge>
-                                        </div>
-                                    )}
-
-                                    {!event.is_canceled && event.remaining_tickets === 0 && (
-                                        <div className="py-2 text-center">
-                                            <Badge variant="secondary">Sold Out</Badge>
-                                        </div>
-                                    )}
                                 </div>
                             </CardContent>
                         </Card>

@@ -6,22 +6,23 @@ import { type Event } from "@/types"
 
 export function EventCard({ event }: { event: Event }) {
 
+    console.log(event);
   return (
-    <Card className="overflow-hidden transition-all hover:shadow-md">
-      <div className="relative w-full aspect-video overflow-hidden">
-        <img
-          src={event.image || "/placeholder.svg"}
-          alt={event.name}
-          className="w-full h-full object-cover transition-transform duration-300 transform hover:scale-105"
-        />
-        {event.is_canceled && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/60">
-            <Badge variant="destructive" className="text-lg px-3 py-1.5">
-              Canceled
-            </Badge>
-          </div>
-        )}
-      </div>
+    <Card className="flex flex-col overflow-hidden transition-all hover:shadow-md">
+        <div className="relative w-full aspect-[4/3] overflow-hidden">
+            <img
+            src={event.image || "/placeholder.svg"}
+            alt={event.name}
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+            />
+            {event.is_canceled && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/60">
+                <Badge variant="destructive" className="text-lg px-3 py-1.5">
+                Canceled
+                </Badge>
+            </div>
+            )}
+        </div>
 
       <CardHeader className="p-4 pb-2">
         <div className="flex items-start justify-between">
@@ -54,7 +55,7 @@ export function EventCard({ event }: { event: Event }) {
         <div className="flex items-center text-sm text-muted-foreground">
           <TicketIcon className="mr-1 h-4 w-4" />
           <span>
-            {event.is_canceled ? "Not available" : `${event.remaining_tickets} tickets left`}
+            {event.is_canceled ? "Not available" : `${event.available_spots} tickets left`}
           </span>
         </div>
         <Link

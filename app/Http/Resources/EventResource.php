@@ -20,7 +20,7 @@ class EventResource extends JsonResource
             'name' => $this->name,
             'description' => $this->description,
             'date' => $this->date,
-            'humanDate' => Carbon::createFromTimestamp($this->date)->format('F j, Y'),  //15 July, 2025
+            'humanDate' => Carbon::createFromTimestamp($this->date)->format('F j, Y'),
             'location' => $this->location,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
@@ -29,18 +29,14 @@ class EventResource extends JsonResource
             'user_id' => $this->user_id,
             'image' => 'https://placehold.co/600',
             'is_canceled' => $this->is_canceled,
-            'remaining_tickets' => $this->availableSpots(),
-            // 'user' => new UserResource($this->whenLoaded('user')),
-            // 'tickets' => TicketResource::collection($this->whenLoaded('tickets')),
-            // 'has_enough_tickets' => $this->whenLoaded('hasEnoughTickets', function () {
-            //     return $this->hasEnoughTickets();
-            // }),
-            // 'is_user_event' => $this->whenLoaded('isUserEvent', function () {
-            //     return $this->isUserEvent();
-            // }),
-            // 'is_user_ticket' => $this->whenLoaded('isUserTicket', function () {
-            //     return $this->isUserTicket();
-            // }),
+            'available' => $this->availableSpots() > 0,
+            'available_spots' => $this->availableSpots(),
+            'purchased_count' => $this->purchasedCount(),
+            'active_offers' => $this->activeOffers(),
+            'is_event_owner' => $this->isEventOwner(),
+            // 'queue_position' => $this->queuePosition(),
+            'is_past_event' => $this->date < now()->timestamp,
+
         ];
     }
 }

@@ -63,5 +63,20 @@ export type PaginatedResponse<T> = {
     user_id: string
     image: string
     is_canceled: boolean
-    remaining_tickets: number
+    available_spots: number
+    available: boolean
+    active_offers: number
+    purchased_count: number
+    queue_position: QueuePosition
+    is_past_event: boolean
+    is_event_owner: boolean
   }
+
+
+  export interface EventQueuePosition {
+    id: string
+    event_id: string
+    user_id: string
+    status: string
+    expires_at: number | null
+    }

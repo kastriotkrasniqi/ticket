@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Enums\TicketStatus;
+use App\Enums\WaitingStatus;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Event extends Model
 {
@@ -44,14 +46,16 @@ class Event extends Model
         return $this->hasMany(Ticket::class, 'event_id');
     }
 
+    public function waitingListEntries()
+    {
+        return $this->hasMany(WaitingListEntry::class, 'event_id');
+    }
+
 
     public function purchasedCount(): int
     {
         return $this->tickets()
-            ->where(function ($query) {
-                $query->where('status', 'valid')
-                    ->orWhere('status', 'used');
-            })
+            ->whereIn('status',[TicketStatus::VALID, TicketStatus::USED])
             ->count();
     }
 
@@ -69,5 +73,29 @@ class Event extends Model
     {
         return $this->availableSpots() > 0;
     }
+
+    public function existingEntry(User $user): bool
+    {
+        return $this->waitingListEntries()
+            ->where('user_id', $user->id)
+            ->where('status','!=', WaitingStatus::EXPIRED)
+            ->exists();
+    }
+
+    public function isEventOwner(): bool
+    {
+        return $this->user_id === auth()->user()?->id  ?? false;
+    }
+
+    // public function queuePosition()
+    // {
+    //     return $this->waitingListEntries()
+    //         ->where('user_id', auth()->user()->id)
+    //         ->where('status','!=' ,WaitingStatus::EXPIRED)
+    //         ->where('created_at', '<=', $this->created_at)
+    //         ->first();
+    // }
+
+
 
 }
