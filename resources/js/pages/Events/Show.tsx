@@ -10,12 +10,23 @@ import { SharedData, type Event } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { AlertCircleIcon, ArrowLeftIcon, CalendarIcon, MapPinIcon, TicketIcon, UserIcon } from 'lucide-react';
 import { JoinQueue } from '@/components/client/JoinQueue';
+import Spinner from '@/components/client/Spinner';
 
 export default function Show({ event }: { event: Event }) {
-    const isAvailable = !event.is_canceled && event.available_spots > 0;
-    const { auth } = usePage<SharedData>().props;
+
+    if (!event) {
+        return (
+          <div className="min-h-screen flex items-center justify-center">
+            <Spinner />
+          </div>
+        );
+      }
+
+      console.log('event',event.available_spots);
+
 
     return (
+
         <AppLayout>
             <Head title={event.name} />
 
@@ -122,16 +133,18 @@ export default function Show({ event }: { event: Event }) {
                                     {/* Availability */}
                                     <div className="flex items-center">
                                         <TicketIcon className="text-muted-foreground mr-2 h-5 w-5" />
-                                        {isAvailable ? (
+                                        {event.available && !event.is_past_event && !event.is_canceled ? (
                                             <p>{event.available_spots} tickets available</p>
                                         ) : (
-                                            <p className="text-destructive font-medium">Not available</p>
+                                            <p className="text-muted-foreground font-medium">Not available</p>
                                         )}
                                     </div>
 
                                     <Separator />
 
                                     {/* Ticket Purchase */}
+
+
                                     <JoinQueue event={event} />
 
                                 </div>

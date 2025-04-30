@@ -21,6 +21,11 @@ Route::post('events/{event}/join-waiting-list', [EventController::class, 'joinWa
     ->name('events.join-waiting-list')
     ->middleware('throttle:waiting-list-limiter');
 
+Route::post('/user-ticket', [TicketController::class, 'userTicket']);
+
+Route::post('/queue-position', [EventController::class, 'queuePosition']);
+
+
 
 Route::resource('tickets', TicketController::class);
 

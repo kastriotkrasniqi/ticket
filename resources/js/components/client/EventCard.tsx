@@ -17,7 +17,7 @@ export function EventCard({ event }: { event: Event }) {
             />
             {event.is_canceled && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/60">
-                <Badge variant="destructive" className="text-lg px-3 py-1.5">
+                <Badge variant="outline" className="text-lg px-3 py-1.5 text-white">
                 Canceled
                 </Badge>
             </div>

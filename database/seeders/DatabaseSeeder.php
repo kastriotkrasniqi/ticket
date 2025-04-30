@@ -16,9 +16,9 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // create events factory with users
-        // \App\Models\Event::factory(10)->create([
-        //     'user_id' => User::factory(),
-        // ]);
+        \App\Models\Event::factory(10)->create([
+            'user_id' => User::factory(),
+        ]);
 
         Ticket::factory(10)->create([
             'event_id' => Event::factory(),

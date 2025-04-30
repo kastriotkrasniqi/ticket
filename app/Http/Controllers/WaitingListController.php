@@ -5,33 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Enums\WaitingStatus;
 use Illuminate\Http\Request;
+use App\Jobs\JoinWaitingList;
 use App\Models\WaitingListEntry;
 
 class WaitingListController extends Controller
 {
-
-    public function getQueuePosition($eventId, $userId)
-    {
-        $entry = WaitingListEntry::where('event_id', $eventId)
-            ->where('user_id', $userId)
-            ->where('status','!=' , WaitingStatus::EXPIRED)
-            ->first();
-
-        if ($entry) {
-            $peopleAhead = WaitingListEntry::where('event_id', $eventId)
-                ->where('created_at', '<', $entry->created_at)
-                ->whereIn('status', [WaitingStatus::WAITING, WaitingStatus::OFFERED])
-                ->count();
-
-            return response()->json([
-                'people_ahead' => $peopleAhead + 1,
-                'entry' => $entry,
-            ]);
-        }
-
-        return NULL;
-    }
-
 
     public function waitingUsers($eventId)
     {
@@ -60,27 +38,52 @@ class WaitingListController extends Controller
     }
 
 
-    public function processQueue($eventId)
+
+    public function queuePosition(Request $request)
     {
-        $event = Event::findorFail($eventId);
-        if($event->availableSpots() <= 0) {
-            return response()->json(0);
+        $event = Event::findOrFail($request->event_id);
+        $entry = WaitingListEntry::where('user_id', auth()->user()->id)
+            ->where('event_id', $event->id)
+            ->whereNot('status', WaitingStatus::EXPIRED)
+            ->first();
+
+        if(!$entry) {
+            $peopleAhead = WaitingListEntry::where('event_id', $event->id)
+            ->where('created_at', '<', $entry->created_at)
+            ->whereIn('status', [WaitingStatus::WAITING, WaitingStatus::OFFERED])
+            ->count();
         }
 
-        $waitingUsers = WaitingListEntry::where('event_id', $eventId)
-            ->whereIn('status', [WaitingStatus::WAITING])
-            ->take($event->availableSpots())
-            ->get();
+        $entry->position = $peopleAhead + 1;
 
-        foreach ($waitingUsers as $user) {
-            $user->status = WaitingStatus::OFFERED;
-            $user->expires_at = now()->addMinutes(WaitingListEntry::OFFER_EXPIRE_MINUTES);
-            $user->save();
-        }
-
-        return response()->json($waitingUsers);
-
+        return response()->json($entry);
     }
+
+
+    public function joinWaitingList($eventId)
+    {
+        $event = Event::findOrFail($eventId);
+        $avaialble = $event->availableSpots() > 0;
+
+        if($event->existingEntry(auth()->user())) {
+            return response()->json(['message' => 'You are already on the waiting list'], 422);
+        }
+
+        if(!$avaialble) {
+            return response()->json(['message' => 'No available spots'], 422);
+        }
+
+        JoinWaitingList::dispatch($event, auth()->user());
+
+        return response()->json(
+            [
+                'success' => true,
+                'status' => $avaialble > 0 ? WaitingStatus::OFFERED : WaitingStatus::WAITING,
+                'message' => $avaialble > 0 ? "Ticket offered - you have 15 minutes to purchase" : "Added to waiting list - you'll be notified when a ticket becomes available",
+            ]
+        );
+    }
+
 
 
 

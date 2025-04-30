@@ -61,7 +61,9 @@ class Event extends Model
 
     public function activeOffers(): int
     {
-        return $this->tickets()->where('status', 'offered')->count();
+        return $this->waitingListEntries()->where('status',WaitingStatus::OFFERED)
+        ->where('expires_at' > now()->timestamp)
+        ->count();
     }
 
     public function availableSpots(): int
@@ -74,27 +76,19 @@ class Event extends Model
         return $this->availableSpots() > 0;
     }
 
-    public function existingEntry(User $user): bool
-    {
-        return $this->waitingListEntries()
-            ->where('user_id', $user->id)
-            ->where('status','!=', WaitingStatus::EXPIRED)
-            ->exists();
-    }
-
     public function isEventOwner(): bool
     {
-        return $this->user_id === auth()->user()?->id  ?? false;
+        return $this->user_id === auth()->user()?->id;
     }
 
-    // public function queuePosition()
-    // {
-    //     return $this->waitingListEntries()
-    //         ->where('user_id', auth()->user()->id)
-    //         ->where('status','!=' ,WaitingStatus::EXPIRED)
-    //         ->where('created_at', '<=', $this->created_at)
-    //         ->first();
-    // }
+    public function isSoldOut(): bool
+    {
+        return $this->purchasedCount() >= $this->total_tickets;
+    }
+
+
+
+
 
 
 

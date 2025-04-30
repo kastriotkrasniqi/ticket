@@ -43,11 +43,7 @@ export interface User {
 }
 
 
-export type PaginatedResponse<T> = {
-    data: T[];
-    links: Record<string, any>;
-    meta: Record<string, any>;
-  };
+
 
 
   export interface Event {
@@ -59,7 +55,7 @@ export type PaginatedResponse<T> = {
     humanDate: string
     price: number
     total_tickets: number
-    sold_tickets?: number
+    is_sold_out: boolean
     user_id: string
     image: string
     is_canceled: boolean
@@ -67,16 +63,6 @@ export type PaginatedResponse<T> = {
     available: boolean
     active_offers: number
     purchased_count: number
-    queue_position: QueuePosition
     is_past_event: boolean
-    is_event_owner: boolean
+    is_owner: boolean
   }
-
-
-  export interface EventQueuePosition {
-    id: string
-    event_id: string
-    user_id: string
-    status: string
-    expires_at: number | null
-    }

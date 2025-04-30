@@ -18,12 +18,15 @@ class EventController extends Controller
      */
     public function index(Request $request)
     {
-        $perPage = $request->query('perPage', 5);
-        $events = EventResource::collection(Event::paginate(perPage: $perPage));
+        $events = Event::paginate(5);
 
         return Inertia::render('Events/Index', [
-            'events' => Inertia::merge(fn() => $events),
-            'perPage' => $perPage,
+            'events' => Inertia::merge(function () use ($events) {
+                sleep(2);
+                return EventResource::collection($events->items());
+            }),
+            'current' => $events->currentPage(),
+            'last' => $events->lastPage(),
         ]);
     }
 
@@ -64,30 +67,6 @@ class EventController extends Controller
     }
 
 
-    public function joinWaitingList($eventId)
-    {
-        $event = Event::findOrFail($eventId);
-        $avaialble = $event->availableSpots() > 0;
 
-        if($event->existingEntry(auth()->user())) {
-            return response()->json(['message' => 'You are already on the waiting list'], 422);
-        }
-
-
-
-        if(!$avaialble) {
-            return response()->json(['message' => 'No available spots'], 422);
-        }
-
-        JoinWaitingList::dispatch($event, auth()->user());
-
-        return response()->json(
-            [
-                'success' => true,
-                'status' => $avaialble > 0 ? WaitingStatus::OFFERED : WaitingStatus::WAITING,
-                'message' => $avaialble > 0 ? "Ticket offered - you have 15 minutes to purchase" : "Added to waiting list - you'll be notified when a ticket becomes available",
-            ]
-        );
-    }
 
 }

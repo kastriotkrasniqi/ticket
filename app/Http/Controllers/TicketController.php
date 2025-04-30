@@ -47,4 +47,13 @@ class TicketController extends Controller
     {
         //
     }
+
+    public function userTicket(Request $request)
+    {
+        $user = auth()->user();
+        $ticket = Ticket::where('user_id', $user->id)
+        ->where('event_id', $request->event_id)->first();
+
+        return response()->json($ticket);
+    }
 }

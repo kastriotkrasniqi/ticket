@@ -29,14 +29,13 @@ class EventResource extends JsonResource
             'user_id' => $this->user_id,
             'image' => 'https://placehold.co/600',
             'is_canceled' => $this->is_canceled,
-            'available' => $this->availableSpots() > 0,
+            'available' => $this->isAvailable(),
             'available_spots' => $this->availableSpots(),
             'purchased_count' => $this->purchasedCount(),
             'active_offers' => $this->activeOffers(),
-            'is_event_owner' => $this->isEventOwner(),
-            // 'queue_position' => $this->queuePosition(),
+            'is_owner' => $this->isEventOwner(),
             'is_past_event' => $this->date < now()->timestamp,
-
+            'is_sold_out' => $this->isSoldOut(),
         ];
     }
 }
