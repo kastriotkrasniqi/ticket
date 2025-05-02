@@ -3,11 +3,13 @@
 namespace App\Models;
 
 use App\Enums\WaitingStatus;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class WaitingListEntry extends Model
 {
+    use HasFactory;
     protected $table = 'waiting_list';
 
     const OFFER_EXPIRE_MINUTES = 15; // minutes

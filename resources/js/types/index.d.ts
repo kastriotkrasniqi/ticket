@@ -44,8 +44,6 @@ export interface User {
 
 
 
-
-
   export interface Event {
     id: string
     name: string
@@ -65,4 +63,29 @@ export interface User {
     purchased_count: number
     is_past_event: boolean
     is_owner: boolean
+    user_ticket: Ticket | null
+    queue_position: WaitingList | null
+  }
+
+
+  export interface Ticket {
+    id: string
+    event_id: string
+    user_id: string
+    status: string
+    amount: number
+    created_at: string
+    updated_at: string
+  }
+
+
+  export interface WaitingList {
+    id: string
+    event_id: string
+    user_id: string
+    status: string
+    created_at: string
+    updated_at: string
+    expires_at: string
+    position: number
   }

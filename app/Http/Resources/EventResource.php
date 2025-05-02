@@ -36,6 +36,8 @@ class EventResource extends JsonResource
             'is_owner' => $this->isEventOwner(),
             'is_past_event' => $this->date < now()->timestamp,
             'is_sold_out' => $this->isSoldOut(),
+            'user_ticket' => $this->userTicket(),
+            'queue_position' => $this->queuePosition(),
         ];
     }
 }

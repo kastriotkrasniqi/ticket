@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('event_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->integer('purchased_at');
+            $table->timestamp('purchased_at');
             $table->string('status'); // valid, used, refunded, cancelled
             $table->string('payment_intent_id')->nullable();
             $table->integer('amount')->nullable();

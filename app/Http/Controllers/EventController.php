@@ -45,6 +45,8 @@ class EventController extends Controller
     {
         $event = Event::findOrFail($id);
 
+
+
         return Inertia::render('Events/Show', [
             'event' => new EventResource($event),
         ]);

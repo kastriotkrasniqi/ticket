@@ -4,13 +4,12 @@ namespace Database\Factories;
 
 use App\Models\User;
 use App\Models\Event;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Ticket>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\WaitingListEntry>
  */
-class TicketFactory extends Factory
+class WaitingListEntryFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -22,10 +21,8 @@ class TicketFactory extends Factory
         return [
             'event_id' => Event::factory(),
             'user_id' => User::factory(),
-            'purchased_at' => Carbon::now()->timestamp,
-            'status' => $this->faker->randomElement(['valid', 'used', 'refunded', 'cancelled']),
-            'payment_intent_id' => $this->faker->uuid(),
-            'amount' => $this->faker->numberBetween(1, 5),
+            'status' => $this->faker->randomElement(['waiting', 'offered', 'accepted', 'expired']),
+            'expires_at' => $this->faker->dateTimeBetween('now', '+15 minutes'),
 
         ];
     }

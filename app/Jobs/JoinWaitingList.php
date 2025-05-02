@@ -39,8 +39,6 @@ class JoinWaitingList implements ShouldQueue
             ExpireOfferJob::dispatch($this->event, $this->user)
                 ->delay(now()->addMinutes(WaitingListEntry::OFFER_EXPIRE_MINUTES));
 
-
-
         } else {
             WaitingListEntry::create([
                 'event_id' => $this->event->id,

@@ -4,72 +4,39 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Enums\WaitingStatus;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Jobs\JoinWaitingList;
 use App\Models\WaitingListEntry;
+use Illuminate\Support\Facades\RateLimiter;
 
 class WaitingListController extends Controller
 {
 
-    public function waitingUsers($eventId)
-    {
-        $event = Event::findorFail($eventId);
-        if($event->availableSpots() <= 0) {
-            return response()->json(0);
-        }
-
-        $waitingUsers = WaitingListEntry::where('event_id', $eventId)
-            ->whereIn('status', [WaitingStatus::WAITING])
-            ->take($event->availableSpots())
-            ->count();
-
-        return response()->json($waitingUsers);
-    }
-
-
-    public function activeOffers($eventId)
-    {
-        $activeOffers = WaitingListEntry::where('event_id', $eventId)
-            ->whereIn('status', [WaitingStatus::OFFERED])
-            ->where('expires_at', '>', now()->timestamp)
-            ->count();
-
-        return response()->json($activeOffers);
-    }
-
-
-
-    public function queuePosition(Request $request)
-    {
-        $event = Event::findOrFail($request->event_id);
-        $entry = WaitingListEntry::where('user_id', auth()->user()->id)
-            ->where('event_id', $event->id)
-            ->whereNot('status', WaitingStatus::EXPIRED)
-            ->first();
-
-        if(!$entry) {
-            $peopleAhead = WaitingListEntry::where('event_id', $event->id)
-            ->where('created_at', '<', $entry->created_at)
-            ->whereIn('status', [WaitingStatus::WAITING, WaitingStatus::OFFERED])
-            ->count();
-        }
-
-        $entry->position = $peopleAhead + 1;
-
-        return response()->json($entry);
-    }
-
-
     public function joinWaitingList($eventId)
     {
+        $user = request()->user();
+        $key = 'waiting-list-limiter:' . ($user?->id ?? request()->ip());
+
+        if (RateLimiter::tooManyAttempts($key, 3)) {
+            $seconds = RateLimiter::availableIn($key);
+            $minutes = ceil($seconds / 60);
+            return response()->json([
+                'message' => "Too many attempts. Please try again in {$minutes} minute" . ($minutes > 1 ? 's' : '') . "."
+            ]);
+        }
+
+        RateLimiter::hit($key, 1800);
+
+
         $event = Event::findOrFail($eventId);
         $avaialble = $event->availableSpots() > 0;
 
-        if($event->existingEntry(auth()->user())) {
+        if ($event->existingEntry(auth()->user())) {
             return response()->json(['message' => 'You are already on the waiting list'], 422);
         }
 
-        if(!$avaialble) {
+        if (!$avaialble) {
             return response()->json(['message' => 'No available spots'], 422);
         }
 

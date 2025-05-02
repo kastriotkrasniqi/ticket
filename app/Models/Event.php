@@ -87,6 +87,43 @@ class Event extends Model
     }
 
 
+    public function existingEntry($user): ?WaitingListEntry
+    {
+        return $this->waitingListEntries()
+            ->where('user_id', $user->id)
+            ->whereNot('status', WaitingStatus::EXPIRED)
+            ->first();
+    }
+
+    public function userTicket(): ?Ticket
+    {
+        return $this->tickets()
+            ->where('user_id', auth()->user()?->id)
+            ->first();
+    }
+
+    public function queuePosition(): ?WaitingListEntry
+    {
+        $entry = $this->waitingListEntries()
+            ->where('status', '!=', WaitingStatus::EXPIRED)
+            ->where('user_id', auth()->id())
+            ->first();
+
+        if ($entry) {
+
+            $peopleAhead = $this->waitingListEntries()
+                ->where('created_at', '<', $entry->created_at)
+                ->whereIn('status', [WaitingStatus::WAITING, WaitingStatus::OFFERED])
+                ->count();
+
+            $entry->position = $peopleAhead + 1;
+
+        }
+
+        return $entry;
+    }
+
+
 
 
 

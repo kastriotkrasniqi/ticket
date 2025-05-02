@@ -1,7 +1,6 @@
 import { EventCard } from '@/components/client/EventCard';
 import Spinner from '@/components/client/Spinner';
 import AppLayout from '@/layouts/client/app-layout';
-import type { PaginatedResponse } from '@/types';
 import { Head, WhenVisible } from '@inertiajs/react';
 import { type Event } from "@/types"
 

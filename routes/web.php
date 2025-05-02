@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\WaitingListController;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EventController;
@@ -17,13 +18,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
 Route::resource('events', EventController::class);
-Route::post('events/{event}/join-waiting-list', [EventController::class, 'joinWaitingList'])
-    ->name('events.join-waiting-list')
-    ->middleware('throttle:waiting-list-limiter');
 
-Route::post('/user-ticket', [TicketController::class, 'userTicket']);
+Route::post('events/{event}/join-waiting-list', [WaitingListController::class, 'joinWaitingList'])
+    ->name('events.join-waiting-list');
 
-Route::post('/queue-position', [EventController::class, 'queuePosition']);
+
+
 
 
 
