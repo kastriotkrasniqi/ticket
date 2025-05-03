@@ -20,6 +20,7 @@ class EventResource extends JsonResource
             'name' => $this->name,
             'description' => $this->description,
             'date' => $this->date,
+            'isoDate' => Carbon::createFromTimestamp($this->date)->toIso8601String(),
             'humanDate' => Carbon::createFromTimestamp($this->date)->format('F j, Y'),
             'location' => $this->location,
             'created_at' => $this->created_at,
