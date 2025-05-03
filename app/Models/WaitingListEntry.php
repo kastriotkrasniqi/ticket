@@ -12,7 +12,6 @@ class WaitingListEntry extends Model
     use HasFactory;
     protected $table = 'waiting_list';
 
-    const OFFER_EXPIRE_MINUTES = 15; // minutes
 
     protected $fillable = [
         'event_id',

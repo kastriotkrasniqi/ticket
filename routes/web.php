@@ -22,6 +22,9 @@ Route::resource('events', EventController::class);
 Route::post('events/{event}/join-waiting-list', [WaitingListController::class, 'joinWaitingList'])
     ->name('events.join-waiting-list');
 
+Route::post('/events/{event}/release-offer', [WaitingListController::class, 'releaseOffer'])->name('events.release-offer');
+
+
 
 
 
@@ -29,5 +32,5 @@ Route::post('events/{event}/join-waiting-list', [WaitingListController::class, '
 
 Route::resource('tickets', TicketController::class);
 
-require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';
+require __DIR__ . '/settings.php';
+require __DIR__ . '/auth.php';

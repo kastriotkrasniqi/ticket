@@ -14,7 +14,7 @@ class JoinWaitingList implements ShouldQueue
 {
     use Queueable;
 
-    /**
+    /**z
      * Create a new job instance.
      */
     public function __construct(public Event $event, public User $user)

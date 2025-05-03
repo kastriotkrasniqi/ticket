@@ -16,10 +16,10 @@ return new class extends Migration
             $table->foreignId('event_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('status'); // waiting, offered, purchased, expired
-            $table->timestamp('expires_at')->nullable();
+            $table->integer('expires_at')->nullable();
             $table->timestamps();
 
-            $table->unique(['user_id', 'event_id']);
+            $table->unique(['user_id', 'event_id','status']);
         });
     }
 

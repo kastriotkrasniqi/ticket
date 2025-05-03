@@ -86,6 +86,6 @@ export interface User {
     status: string
     created_at: string
     updated_at: string
-    expires_at: string
+    expires_at: number
     position: number
   }

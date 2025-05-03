@@ -62,7 +62,7 @@ class Event extends Model
     public function activeOffers(): int
     {
         return $this->waitingListEntries()->where('status',WaitingStatus::OFFERED)
-        ->where('expires_at' > now()->timestamp)
+        ->where('expires_at', '>' ,now()->timestamp)
         ->count();
     }
 

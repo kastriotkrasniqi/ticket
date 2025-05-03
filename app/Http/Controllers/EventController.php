@@ -43,8 +43,7 @@ class EventController extends Controller
      */
     public function show($id)
     {
-        $event = Event::findOrFail($id);
-
+        $event = Event::with(['tickets', 'waitingListEntries'])->findOrFail($id);
 
 
         return Inertia::render('Events/Show', [
