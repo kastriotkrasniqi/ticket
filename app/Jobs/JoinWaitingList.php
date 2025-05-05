@@ -31,13 +31,13 @@ class JoinWaitingList implements ShouldQueue
             WaitingListEntry::create([
                 'event_id' => $this->event->id,
                 'user_id' => $this->user->id,
-                'expires_at' => now()->addMinutes(WaitingListEntry::OFFER_EXPIRE_MINUTES),
+                'expires_at' => now()->addMinutes(config('tickets.offer_expire_minutes'))->timestamp,
                 'status' => WaitingStatus::OFFERED,
             ]);
 
             // Schedule a job to expire this offer after the offer duration
             ExpireOfferJob::dispatch($this->event, $this->user)
-                ->delay(now()->addMinutes(WaitingListEntry::OFFER_EXPIRE_MINUTES));
+                ->delay(now()->addMinutes(config('tickets.offer_expire_minutes')->timestamp));
 
         } else {
             WaitingListEntry::create([

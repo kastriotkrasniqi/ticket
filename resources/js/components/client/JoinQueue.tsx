@@ -3,20 +3,45 @@ import Spinner from '@/components/client/Spinner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { type Event, SharedData } from '@/types';
-import { Link, usePage, router } from '@inertiajs/react';
-import { CalendarIcon, Clock, OctagonXIcon , XCircle } from 'lucide-react';
+import { Link, router, usePage } from '@inertiajs/react';
+import axios from 'axios';
+import { Clock, OctagonXIcon, XCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import axios from 'axios';
 
 export function JoinQueue({ event }: { event: Event }) {
     const { auth } = usePage<SharedData>().props;
     const [loading, setLoading] = useState(false);
     const [timeRemaining, setTimeRemaining] = useState('');
+    const isLoggedIn = !!auth?.user;
 
-    const expiresAt = event.queue_position?.expires_at
-    ? event.queue_position.expires_at * 1000
-    : null;
+    const expiresAt = event.queue_position?.expires_at ? event.queue_position.expires_at * 1000 : null;
+
+    useEffect(() => {
+        if (!auth?.user?.id) return;
+
+        const channel = window.Echo.private(`App.Models.User.${auth.user.id}`);
+
+        const listenForWaitingStatusUpdate = () => {
+            channel.listen('WaitingStatusUpdate', (event: any) => {
+                console.log('Socket connection established and event received:', event);
+                router.reload();
+            });
+        };
+
+
+        if (event?.queue_position?.status === 'waiting') {
+            listenForWaitingStatusUpdate();
+        }
+
+
+        return () => {
+            if (event?.queue_position?.status !== 'waiting') {
+                channel.stopListening('WaitingStatusUpdate');
+                window.Echo.leave(`App.Models.User.${auth.user.id}`);
+            }
+        };
+    }, [auth?.user?.id, event]);
 
     useEffect(() => {
         const calculateTimeRemaining = () => {
@@ -31,21 +56,18 @@ export function JoinQueue({ event }: { event: Event }) {
             const minutes = Math.floor(diff / 1000 / 60);
             const seconds = Math.floor((diff / 1000) % 60);
 
-            if (minutes > 0) {
-                setTimeRemaining(
-                    `${minutes} minute${minutes === 1 ? '' : 's'} ${seconds} second${seconds === 1 ? '' : 's'}`
-                );
-            } else {
-                setTimeRemaining(`${seconds} second${seconds === 1 ? '' : 's'}`);
-            }
+            // Factorize and display time in a clean format
+            const timeString = minutes > 0
+                ? `${minutes} minute${minutes === 1 ? '' : 's'} ${seconds} second${seconds === 1 ? '' : 's'}`
+                : `${seconds} second${seconds === 1 ? '' : 's'}`;
+
+            setTimeRemaining(timeString);
         };
 
         calculateTimeRemaining();
         const interval = setInterval(calculateTimeRemaining, 1000);
         return () => clearInterval(interval);
     }, [expiresAt]);
-
-    const isLoggedIn = !!auth?.user;
 
     const handleJoinQueue = () => {
         setLoading(true);
@@ -61,10 +83,10 @@ export function JoinQueue({ event }: { event: Event }) {
             .finally(() => setLoading(false));
     };
 
-    const handleReleaseOffer = () => {
+    const handleReleaseOffer = (status: string) => {
         setLoading(true);
         axios
-            .post(route('events.release-offer', event.id))
+            .post(route('events.release-offer', event.id), { status })
             .then((res) => {
                 toast.success(res.data.message);
                 router.reload();
@@ -107,14 +129,14 @@ export function JoinQueue({ event }: { event: Event }) {
     if (event.queue_position?.status === 'offered') {
         return (
             <div className="space-y-2 text-center">
-                <p className="text-sm text-foreground font-medium">
+                <p className="text-foreground text-sm font-medium">
                     🎟️ You have an offer! Time left: <span className="font-bold">{timeRemaining}</span>
                 </p>
                 <Button className="w-full" onClick={handlePurchaseTicket} disabled={timeRemaining === 'Expired'}>
                     Purchase Ticket
                 </Button>
-                <Button variant="destructive" className="w-full" onClick={handleReleaseOffer}>
-                <XCircle className="w-4 h-4" />
+                <Button variant="destructive" className="w-full" onClick={() => handleReleaseOffer('offered')}>
+                    <XCircle className="h-4 w-4" />
                     Release Offer
                 </Button>
             </div>
@@ -123,24 +145,31 @@ export function JoinQueue({ event }: { event: Event }) {
 
     if (event.queue_position?.status === 'waiting') {
         return (
-            <div className="text-center space-y-2">
-                <p className="text-sm text-muted-foreground">
+            <div className="space-y-2 text-center">
+                <p className="text-muted-foreground text-sm">
                     You're in the queue. Position: <span className="font-bold">{event.queue_position.position}</span>
                 </p>
                 <Button variant="outline" disabled className="w-full">
                     Waiting...
                 </Button>
+
+                <Button variant="outline" disabled className="w-full" onClick={() => handleReleaseOffer('waiting')}>
+                    Leave the waiting list
+                </Button>
+
             </div>
         );
     }
 
-    if (!event.available) {
+    if (!event.available || event.is_sold_out) {
         return (
-            <div className="text-center space-y-2">
+            <div className="space-y-2 text-center">
                 <p className="text-muted-foreground text-sm">
-                    {event.is_sold_out ? 'Sorry, this event is sold out' : 'Tickets are not available'}
+                    {event.is_sold_out ? 'Sold Out.' : 'Tickets are not available, but you can join the waiting list.'}
                 </p>
-                <LoginPrompt />
+                <Button onClick={handleJoinQueue} variant="default" className="w-full" disabled={loading}>
+                    {loading ? 'Joining queue...' : 'Buy the ticket'}
+                </Button>
             </div>
         );
     }
@@ -148,35 +177,30 @@ export function JoinQueue({ event }: { event: Event }) {
     return (
         <div className="space-y-2 text-center">
             <Button onClick={handleJoinQueue} variant="default" className="w-full" disabled={loading}>
-                {loading ? 'Processing...' : 'Join Queue'}
+                {loading ? 'Joining queue...' : 'Buy the ticket'}
             </Button>
+
             <AddToCalendar event={event} />
         </div>
     );
 }
 
-function Message({ icon, text, muted = false }: { icon: JSX.Element; text: string; muted?: boolean }) {
+const Message = ({ icon, text, muted }: { icon: any; text: string; muted?: boolean }) => {
     return (
-        <div
-            className={`mb-2 flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 ${
-                muted ? 'bg-gray-100 text-gray-500' : 'bg-gray-100 text-gray-700'
-            }`}
-        >
-            {icon}
-            <span>{text}</span>
+        <div className={`space-y-2 text-center ${muted ? 'text-muted-foreground' : 'text-foreground'}`}>
+            <div className="text-foreground flex items-center justify-center">{icon}</div>
+            <p className="text-sm">{text}</p>
         </div>
     );
-}
+};
 
-function LoginPrompt() {
-    return (
-        <div className="text-center">
-            <p className="text-muted-foreground text-sm">Please log in to buy tickets</p>
-            <Button variant="outline" className="mt-4 w-full">
-                <Link method="get" href={route('login')} as="button">
-                    Login
-                </Link>
+const LoginPrompt = () => (
+    <div className="space-y-2 text-center">
+        <p className="text-muted-foreground text-sm">Please log in to buy the ticket</p>
+        <Link as="button" href={route('login')} className="w-full cursor-pointer">
+            <Button className="w-full" variant={'outline'}>
+                Log in
             </Button>
-        </div>
-    );
-}
+        </Link>
+    </div>
+);

@@ -1,28 +1,26 @@
+import { JoinQueue } from '@/components/client/JoinQueue';
+import Spinner from '@/components/client/Spinner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/client/app-layout';
-import { SharedData, type Event } from '@/types';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { type Event } from '@/types';
+import { Head } from '@inertiajs/react';
 import { AlertCircleIcon, ArrowLeftIcon, CalendarIcon, MapPinIcon, TicketIcon, UserIcon } from 'lucide-react';
-import { JoinQueue } from '@/components/client/JoinQueue';
-import Spinner from '@/components/client/Spinner';
 
 export default function Show({ event }: { event: Event }) {
-
     if (!event) {
         return (
-          <div className="min-h-screen flex items-center justify-center">
-            <Spinner />
-          </div>
+            <div className="flex min-h-screen items-center justify-center">
+                <Spinner />
+            </div>
         );
-      }
+    }
 
-
+    console.log(event);
 
     return (
-
         <AppLayout>
             <Head title={event.name} />
 
@@ -121,49 +119,68 @@ export default function Show({ event }: { event: Event }) {
                                     </div>
 
                                     {/* Price */}
-                                    <div className="flex items-center">
-                                        <div className="font-medium">Price:</div>
-                                        <div className="ml-auto text-xl font-bold">${event.price.toFixed(2)}</div>
-                                    </div>
+                                    {!event.is_past_event && (
+                                        <div className="flex items-center">
+                                            <div className="font-medium">Price:</div>
+                                            <div className="ml-auto text-xl font-bold">
+                                                {event.is_canceled ? (
+                                                    <span className="text-sm text-red-600">Canceled</span>
+                                                ) : (
+                                                    `$${event.price.toFixed(2)}`
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
 
                                     {/* Availability */}
                                     <div className="flex items-center">
                                         <TicketIcon className="text-muted-foreground mr-2 h-5 w-5" />
-                                        {event.available && !event.is_past_event && !event.is_canceled ? (
-                                            <p>{event.available_spots} tickets available</p>
-                                        ) : (
-                                            <p className="text-muted-foreground font-medium">Not available</p>
+
+                                        {/* Check if event is not past and not canceled */}
+                                        {!event.is_past_event && !event.is_canceled && (
+                                            <p>
+                                                {event.total_tickets - event.purchased_count} / {event.total_tickets} available
+                                            </p>
+                                        )}
+
+                                        {/* Check for active offers */}
+                                        {!event.is_past_event && event.active_offers > 0 && (
+                                            <p className="text-muted-foreground font-medium">
+                                                <span className="ml-2 text-xs text-amber-600">
+                                                    ({event.active_offers} trying to buy)
+                                                </span>
+                                            </p>
                                         )}
                                     </div>
 
                                     <Separator />
 
                                     {/* Ticket Purchase */}
-
-
                                     <JoinQueue event={event} />
-
                                 </div>
                             </CardContent>
                         </Card>
 
                         {/* Share Card */}
-                        <Card>
-                            <CardContent>
-                                <h3 className="mb-4 font-medium">Share this event</h3>
-                                <div className="flex space-x-2">
-                                    <Button variant="outline" size="sm" className="flex-1">
-                                        Facebook
-                                    </Button>
-                                    <Button variant="outline" size="sm" className="flex-1">
-                                        Twitter
-                                    </Button>
-                                    <Button variant="outline" size="sm" className="flex-1">
-                                        Email
-                                    </Button>
-                                </div>
-                            </CardContent>
-                        </Card>
+
+                        {!event.is_canceled && !event.is_past_event && (
+                            <Card>
+                                <CardContent>
+                                    <h3 className="mb-4 font-medium">Share this event</h3>
+                                    <div className="flex space-x-2">
+                                        <Button variant="outline" size="sm" className="flex-1">
+                                            Facebook
+                                        </Button>
+                                        <Button variant="outline" size="sm" className="flex-1">
+                                            Twitter
+                                        </Button>
+                                        <Button variant="outline" size="sm" className="flex-1">
+                                            Email
+                                        </Button>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        )}
                     </div>
                 </div>
             </div>

@@ -10,8 +10,8 @@ class RateLimiterServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
-        RateLimiter::for('waiting-list-limiter', function (Request $request) {
-            return Limit::perMinutes(30, 3)->by(optional($request->user())->id ?: $request->ip());
-        });
+        // RateLimiter::for('waiting-list-limiter', function (Request $request) {
+        //     return Limit::perMinutes(30, 3)->by(optional($request->user())->id ?: $request->ip());
+        // });
     }
 }

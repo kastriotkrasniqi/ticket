@@ -16,7 +16,7 @@ class ExpireOfferJob implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(public Event $event, public User $user)
+    public function __construct(public WaitingListEntry $entry)
     {
         //
     }
@@ -26,14 +26,12 @@ class ExpireOfferJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $entry = WaitingListEntry::where('event_id', $this->event->id)
-            ->where('user_id', $this->user->id)
-            ->where('status', WaitingStatus::OFFERED)
-            ->first();
+        if ($this->entry) {
 
-        if ($entry) {
-            $entry->status = WaitingStatus::EXPIRED;
-            $entry->save();
+            $this->entry->status = WaitingStatus::EXPIRED;
+            $this->entry->save();
+
+            OfferNextInQueueJob::dispatch($this->entry->event_id);
         }
     }
 }

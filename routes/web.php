@@ -1,10 +1,11 @@
 <?php
 
-use App\Http\Controllers\WaitingListController;
 use Inertia\Inertia;
+use App\Events\WaitingStatusUpdate;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\TicketController;
+use App\Http\Controllers\WaitingListController;
 
 Route::get('/', function () {
     return redirect('events');
@@ -23,10 +24,6 @@ Route::post('events/{event}/join-waiting-list', [WaitingListController::class, '
     ->name('events.join-waiting-list');
 
 Route::post('/events/{event}/release-offer', [WaitingListController::class, 'releaseOffer'])->name('events.release-offer');
-
-
-
-
 
 
 
