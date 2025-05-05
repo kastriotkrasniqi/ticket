@@ -26,12 +26,12 @@ class ExpireOfferJob implements ShouldQueue
      */
     public function handle(): void
     {
-        if ($this->entry) {
-
-            $this->entry->status = WaitingStatus::EXPIRED;
-            $this->entry->save();
-
-            OfferNextInQueueJob::dispatch($this->entry->event_id);
+        if (! $this->entry || $this->entry->status !== WaitingStatus::OFFERED) {
+            return;
         }
+
+        $this->entry->update(['status' => WaitingStatus::EXPIRED]);
+
+        OfferNextInQueueJob::dispatch($this->entry->event_id);
     }
 }

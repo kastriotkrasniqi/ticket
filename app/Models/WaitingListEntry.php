@@ -21,7 +21,7 @@ class WaitingListEntry extends Model
     ];
 
     protected $casts = [
-        'status' => WaitingStatus::class
+        'status' => WaitingStatus::class,
     ];
 
     public function event(): BelongsTo
