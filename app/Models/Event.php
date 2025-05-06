@@ -7,10 +7,16 @@ use App\Enums\WaitingStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Laravel\Scout\Searchable;
 
 class Event extends Model
 {
     use HasFactory;
+    use Searchable;
+
+    protected ?int $purchasedCountCache = null;
+
+    protected ?int $activeOffersCache = null;
 
     protected $fillable = [
         'name',
@@ -32,9 +38,21 @@ class Event extends Model
         ];
     }
 
-    protected ?int $purchasedCountCache = null;
 
-    protected ?int $activeOffersCache = null;
+    public function toSearchableArray()
+    {
+        return [
+            'id' => (string) $this->id,
+            'name' => $this->name,
+            'description' => $this->description,
+            'location' => $this->location,
+            'date' => (int) $this->date->timestamp,
+            'price' => (float) $this->price,
+            'created_at' => $this->created_at->timestamp,
+        ];
+    }
+
+
 
     public function user()
     {

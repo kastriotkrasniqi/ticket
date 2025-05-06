@@ -4,3 +4,16 @@ import { twMerge } from 'tailwind-merge';
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
+
+
+
+export function formatDate(dateString: string): string {
+    const date = new Date(dateString)
+
+    // For search results, we want a more compact format
+    return new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }).format(date)
+  }

@@ -59,4 +59,26 @@ class EventController extends Controller
     {
         //
     }
+
+
+    public function search($query)
+    {
+
+        if (empty($query)) {
+            return response()->json([]);
+        }
+
+        try {
+            $events = Event::search($query)->options([
+                'query_by' => 'name, description'
+            ])->get();
+
+            return response()->json(EventResource::collection($events));
+        } catch (\Throwable $th) {
+            return response()->json(['error' => 'Error occurred while searching.'], 500);
+
+        }
+
+    }
+
 }

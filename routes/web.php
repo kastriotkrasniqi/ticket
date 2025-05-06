@@ -23,6 +23,8 @@ Route::post('events/{event}/join-waiting-list', [WaitingListController::class, '
 
 Route::post('/events/{event}/release-offer', [WaitingListController::class, 'releaseOffer'])->name('events.release-offer');
 
+Route::get('/search/{query}', [EventController::class, 'search'])->name('events.search');
+
 Route::resource('tickets', TicketController::class);
 
 require __DIR__.'/settings.php';
