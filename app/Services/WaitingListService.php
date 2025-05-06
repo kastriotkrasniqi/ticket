@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Jobs\IssueNextWaitingListOffer;
 use App\Models\Event;
 use App\Models\User;
 use App\Enums\WaitingStatus;
@@ -59,4 +60,34 @@ class WaitingListService
             ];
         });
     }
+
+
+
+    public static function release(Event $event, User $user, string $status): array
+    {
+        $entry = $event->waitingListEntries()
+            ->where('user_id', $user->id)
+            ->where('status', $status)
+            ->first();
+
+        if (!$entry) {
+            throw ValidationException::withMessages([
+                'waiting_list' => 'No active offer to release.',
+            ]);
+        }
+
+        if ($entry->status === WaitingStatus::OFFERED) {
+            $entry->update(['status' => WaitingStatus::EXPIRED]);
+
+            // If releasing the offer creates availability, trigger next offer
+            if ($event->availableSpots() > 0) {
+                IssueNextWaitingListOffer::dispatch($event->id);
+            }
+        } else {
+            $entry->delete(); // remove WAITING entries on release
+        }
+
+        return ['message' => 'Offer released'];
+    }
+
 }

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { type Event, SharedData } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import axios from 'axios';
-import { Clock, OctagonXIcon, XCircle } from 'lucide-react';
+import { Clock, OctagonXIcon, XCircle, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -16,35 +16,35 @@ export function JoinQueue({ event }: { event: Event }) {
     const isLoggedIn = !!auth?.user;
 
     const expiresAt = event.queue_position?.expires_at ? event.queue_position.expires_at * 1000 : null;
+    const isOfferExpired = expiresAt && Date.now() > expiresAt;
 
+    // Listen for real-time updates if in queue
     useEffect(() => {
         if (!auth?.user?.id) return;
 
-        const channel = window.Echo.private(`App.Models.User.${auth.user.id}`);
-
-        const listenForWaitingStatusUpdate = () => {
-            channel.listen('WaitingStatusUpdate', (event: any) => {
-                console.log('Socket connection established and event received:', event);
-                router.reload();
-            });
-        };
-
+        const channelName = `App.Models.User.${auth.user.id}`;
+        const channel = window.Echo.private(channelName);
 
         if (event?.queue_position?.status === 'waiting') {
-            listenForWaitingStatusUpdate();
+            channel.listen('WaitingStatusUpdate', (e: any) => {
+                console.log('Received update:', e);
+                try {
+                    router.reload();
+                } catch {
+                    toast.error('Failed to refresh. Please try manually.');
+                }
+            });
         }
 
-
         return () => {
-            if (event?.queue_position?.status !== 'waiting') {
-                channel.stopListening('WaitingStatusUpdate');
-                window.Echo.leave(`App.Models.User.${auth.user.id}`);
-            }
+            channel.stopListening('WaitingStatusUpdate');
+            window.Echo.leave(channelName);
         };
-    }, [auth?.user?.id, event]);
+    }, [auth?.user?.id, event?.queue_position?.status]);
 
+    // Timer logic for offered ticket
     useEffect(() => {
-        const calculateTimeRemaining = () => {
+        const updateTime = () => {
             const now = Date.now();
 
             if (!expiresAt || now >= expiresAt) {
@@ -56,20 +56,25 @@ export function JoinQueue({ event }: { event: Event }) {
             const minutes = Math.floor(diff / 1000 / 60);
             const seconds = Math.floor((diff / 1000) % 60);
 
-            // Factorize and display time in a clean format
-            const timeString = minutes > 0
-                ? `${minutes} minute${minutes === 1 ? '' : 's'} ${seconds} second${seconds === 1 ? '' : 's'}`
-                : `${seconds} second${seconds === 1 ? '' : 's'}`;
+            const timeStr =
+                minutes > 0
+                    ? `${minutes}m ${seconds}s`
+                    : `${seconds}s`;
 
-            setTimeRemaining(timeString);
+            setTimeRemaining(timeStr);
         };
 
-        calculateTimeRemaining();
-        const interval = setInterval(calculateTimeRemaining, 1000);
+        updateTime();
+        const interval = setInterval(updateTime, 1000);
         return () => clearInterval(interval);
     }, [expiresAt]);
 
     const handleJoinQueue = () => {
+        if (event.queue_position) {
+            toast('You are already in the queue or have an offer.');
+            return;
+        }
+
         setLoading(true);
         axios
             .post(route('events.join-waiting-list', event.id))
@@ -98,19 +103,15 @@ export function JoinQueue({ event }: { event: Event }) {
     };
 
     const handlePurchaseTicket = () => {
-        // TODO: Navigate to checkout
+        // TODO: Implement actual checkout logic
         toast('Redirecting to purchase... (not implemented)');
     };
 
     if (!event) return <Spinner />;
 
-    if (event.is_owner) {
-        return <Message icon={<OctagonXIcon />} text="You cannot buy a ticket for your own event" />;
-    }
+    if (event.is_owner) return <Message icon={<OctagonXIcon />} text="You cannot buy a ticket for your own event" />;
 
-    if (event.is_past_event) {
-        return <Message icon={<Clock />} text="Event has ended" muted />;
-    }
+    if (event.is_past_event) return <Message icon={<Clock />} text="Event has ended" muted />;
 
     if (event.is_canceled) {
         return (
@@ -122,9 +123,7 @@ export function JoinQueue({ event }: { event: Event }) {
         );
     }
 
-    if (!isLoggedIn) {
-        return <LoginPrompt />;
-    }
+    if (!isLoggedIn) return <LoginPrompt />;
 
     if (event.queue_position?.status === 'offered') {
         return (
@@ -132,11 +131,11 @@ export function JoinQueue({ event }: { event: Event }) {
                 <p className="text-foreground text-sm font-medium">
                     🎟️ You have an offer! Time left: <span className="font-bold">{timeRemaining}</span>
                 </p>
-                <Button className="w-full" onClick={handlePurchaseTicket} disabled={timeRemaining === 'Expired'}>
-                    Purchase Ticket
+                <Button className="w-full" onClick={handlePurchaseTicket} disabled={isOfferExpired}>
+                    {isOfferExpired ? 'Offer expired' : 'Purchase Ticket'}
                 </Button>
                 <Button variant="destructive" className="w-full" onClick={() => handleReleaseOffer('offered')}>
-                    <XCircle className="h-4 w-4" />
+                    <XCircle className="h-4 w-4 mr-1" />
                     Release Offer
                 </Button>
             </div>
@@ -152,11 +151,10 @@ export function JoinQueue({ event }: { event: Event }) {
                 <Button variant="outline" disabled className="w-full">
                     Waiting...
                 </Button>
-
-                <Button variant="outline" disabled className="w-full" onClick={() => handleReleaseOffer('waiting')}>
+                <Button variant="outline" className="w-full" onClick={() => handleReleaseOffer('waiting')} disabled={loading}>
+                    {loading && <Loader2 className="animate-spin h-4 w-4 mr-1" />}
                     Leave the waiting list
                 </Button>
-
             </div>
         );
     }
@@ -168,7 +166,14 @@ export function JoinQueue({ event }: { event: Event }) {
                     {event.is_sold_out ? 'Sold Out.' : 'Tickets are not available, but you can join the waiting list.'}
                 </p>
                 <Button onClick={handleJoinQueue} variant="default" className="w-full" disabled={loading}>
-                    {loading ? 'Joining queue...' : 'Buy the ticket'}
+                    {loading ? (
+                        <>
+                            <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                            Joining queue...
+                        </>
+                    ) : (
+                        'Buy the ticket'
+                    )}
                 </Button>
             </div>
         );
@@ -177,9 +182,15 @@ export function JoinQueue({ event }: { event: Event }) {
     return (
         <div className="space-y-2 text-center">
             <Button onClick={handleJoinQueue} variant="default" className="w-full" disabled={loading}>
-                {loading ? 'Joining queue...' : 'Buy the ticket'}
+                {loading ? (
+                    <>
+                        <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                        Joining queue...
+                    </>
+                ) : (
+                    'Buy the ticket'
+                )}
             </Button>
-
             <AddToCalendar event={event} />
         </div>
     );

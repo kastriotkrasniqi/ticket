@@ -13,7 +13,6 @@ class ExpireWaitingListOffer implements ShouldQueue
 {
     use Queueable;
 
-    public $queue = 'offers';
 
     /**
      * Create a new job instance.
@@ -32,7 +31,8 @@ class ExpireWaitingListOffer implements ShouldQueue
             return;
         }
 
-        $this->entry->update(['status' => WaitingStatus::EXPIRED]);
+        $this->entry->status = WaitingStatus::EXPIRED;
+        $this->entry->save();
 
         IssueNextWaitingListOffer::dispatch($this->entry->event_id);
     }

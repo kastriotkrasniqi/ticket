@@ -50,30 +50,21 @@ class WaitingListController extends Controller
 
     public function releaseOffer($eventId, Request $request)
     {
-        $entry = WaitingListEntry::where('event_id', $eventId)
-            ->where('user_id', auth()->id())
-            ->where('status', $request->status)
-            ->first();
+        $user = auth()->user();
+        $event = Event::where('id', $eventId)->firstOrFail();
 
-        if (!$entry) {
-            return response()->json(['message' => 'No active offer to release'], 422);
+        try {
+            $result = WaitingListService::release($event, $user, $request->status);
+
+            return response()->json([
+                'success' => true,
+                'message' => $result['message'],
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 422);
         }
-
-        $event = Event::findOrFail($eventId);
-
-        if ($entry->status === WaitingStatus::OFFERED) {
-            $entry->update(['status' => WaitingStatus::EXPIRED]);
-
-            // If this release creates availability, immediately offer to next
-            if ($event->availableSpots() > 0) {
-                IssueNextWaitingListOffer::dispatch($eventId);
-            }
-
-        } else {
-            $entry->delete();
-        }
-
-        return response()->json(['message' => 'Offer released']);
     }
 
 

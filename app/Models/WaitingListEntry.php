@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use App\Enums\WaitingStatus;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class WaitingListEntry extends Model
 {
@@ -24,6 +26,14 @@ class WaitingListEntry extends Model
         'status' => WaitingStatus::class,
         'expires_at' => 'datetime'
     ];
+
+    protected function expiresAt(): Attribute
+    {
+        return Attribute::make(
+            get: fn (string $value) => $value,
+            set: fn (string $value) => Carbon::parse($value)->timestamp,
+        );
+    }
 
     public function event(): BelongsTo
     {

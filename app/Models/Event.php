@@ -29,6 +29,7 @@ class Event extends Model
     {
         return [
             'is_canceled' => 'boolean',
+            'date' => 'datetime',
         ];
     }
 
