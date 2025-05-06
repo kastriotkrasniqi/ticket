@@ -4,8 +4,8 @@ namespace App\Notifications;
 
 use App\Models\Event;
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
 class TicketOfferNotification extends Notification
 {
@@ -24,10 +24,10 @@ class TicketOfferNotification extends Notification
     public function toMail($notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Tickets Available for ' . $this->event->name)
-            ->line('Good news! Tickets are now available for ' . $this->event->name)
+            ->subject('Tickets Available for '.$this->event->name)
+            ->line('Good news! Tickets are now available for '.$this->event->name)
             ->line('You have 30 minutes to purchase your tickets before this offer expires.')
             ->action('Purchase Tickets', route('tickets.purchase', $this->event))
-            ->line('Offer expires at: ' . $this->expiresAt->format('Y-m-d H:i:s'));
+            ->line('Offer expires at: '.$this->expiresAt->format('Y-m-d H:i:s'));
     }
 }

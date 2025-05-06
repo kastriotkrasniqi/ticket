@@ -16,7 +16,8 @@ export function JoinQueue({ event }: { event: Event }) {
     const isLoggedIn = !!auth?.user;
 
     const expiresAt = event.queue_position?.expires_at ? event.queue_position.expires_at * 1000 : null;
-    const isOfferExpired = expiresAt && Date.now() > expiresAt;
+    const isOfferExpired: boolean | undefined = expiresAt !== null && expiresAt !== 0 ? Date.now() > expiresAt : undefined;
+
 
     // Listen for real-time updates if in queue
     useEffect(() => {

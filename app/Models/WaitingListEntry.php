@@ -4,16 +4,16 @@ namespace App\Models;
 
 use App\Enums\WaitingStatus;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class WaitingListEntry extends Model
 {
     use HasFactory;
-    protected $table = 'waiting_list';
 
+    protected $table = 'waiting_list';
 
     protected $fillable = [
         'event_id',
@@ -24,7 +24,7 @@ class WaitingListEntry extends Model
 
     protected $casts = [
         'status' => WaitingStatus::class,
-        'expires_at' => 'datetime'
+        'expires_at' => 'datetime',
     ];
 
     protected function expiresAt(): Attribute
@@ -44,7 +44,4 @@ class WaitingListEntry extends Model
     {
         return $this->belongsTo(User::class);
     }
-
-
-
 }

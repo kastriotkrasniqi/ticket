@@ -1,13 +1,13 @@
 <?php
+
 namespace App\Jobs;
 
-use App\Jobs\IssueOfferJob;
 use App\Enums\WaitingStatus;
 use App\Models\WaitingListEntry;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 
 class IssueNextWaitingListOffer implements ShouldQueue
 {
@@ -15,7 +15,7 @@ class IssueNextWaitingListOffer implements ShouldQueue
 
     public $queue = 'offers';
 
-    public function __construct(public int $event_id){}
+    public function __construct(public int $event_id) {}
 
     public function handle(): void
     {

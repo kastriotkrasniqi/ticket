@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Ticket;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 
 class TicketController extends Controller
 {
@@ -52,7 +51,7 @@ class TicketController extends Controller
     {
         $user = auth()->user();
         $ticket = Ticket::where('user_id', $user->id)
-        ->where('event_id', $request->event_id)->first();
+            ->where('event_id', $request->event_id)->first();
 
         return response()->json($ticket);
     }

@@ -1,23 +1,15 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Event;
-use App\Jobs\IssueOfferJob;
-use App\Enums\WaitingStatus;
-use Illuminate\Http\Request;
-use App\Models\WaitingListEntry;
-use App\Events\QueueStatusUpdated;
-use Illuminate\Support\Facades\DB;
-use App\Events\WaitingStatusUpdate;
-use App\Jobs\ExpireWaitingListOffer;
 use App\Services\WaitingListService;
-use App\Jobs\IssueNextWaitingListOffer;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
 
 class WaitingListController extends Controller
 {
-
     public function joinWaitingList($eventId)
     {
         // $key = 'waiting-list-limiter:' . $eventId . ':' . ($user?->id ?? request()->ip());
@@ -47,7 +39,6 @@ class WaitingListController extends Controller
         }
     }
 
-
     public function releaseOffer($eventId, Request $request)
     {
         $user = auth()->user();
@@ -66,7 +57,4 @@ class WaitingListController extends Controller
             ], 422);
         }
     }
-
-
-
 }

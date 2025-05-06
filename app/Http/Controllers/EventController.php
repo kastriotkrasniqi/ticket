@@ -2,13 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\WaitingStatus;
 use App\Http\Resources\EventResource;
-use App\Jobs\JoinWaitingList;
 use App\Models\Event;
-use App\Models\WaitingListEntry;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Inertia\Inertia;
 
 class EventController extends Controller
@@ -23,6 +19,7 @@ class EventController extends Controller
         return Inertia::render('Events/Index', [
             'events' => Inertia::merge(function () use ($events) {
                 sleep(2);
+
                 return EventResource::collection($events->items());
             }),
             'current' => $events->currentPage(),
@@ -33,10 +30,7 @@ class EventController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-
-    }
+    public function store(Request $request) {}
 
     /**
      * Display the specified resource.
@@ -44,7 +38,6 @@ class EventController extends Controller
     public function show($id)
     {
         $event = Event::with(['tickets', 'waitingListEntries'])->findOrFail($id);
-
 
         return Inertia::render('Events/Show', [
             'event' => new EventResource($event),
@@ -66,8 +59,4 @@ class EventController extends Controller
     {
         //
     }
-
-
-
-
 }

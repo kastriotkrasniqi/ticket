@@ -4,7 +4,7 @@ namespace App\Enums;
 
 enum TicketStatus: string
 {
-     // valid, used, refunded, cancelled
+    // valid, used, refunded, cancelled
 
     case VALID = 'valid';
     case USED = 'used';

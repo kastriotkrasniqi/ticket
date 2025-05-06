@@ -13,12 +13,12 @@ trait HasTicketStatus
 
     public function isUsed()
     {
-        return $this->status === TicketStatus::USED;;
+        return $this->status === TicketStatus::USED;
     }
 
     public function isRefunded()
     {
-        return $this->status === TicketStatus::REFUNDED;;
+        return $this->status === TicketStatus::REFUNDED;
     }
 
     public function isCancelled()
@@ -28,31 +28,31 @@ trait HasTicketStatus
 
     public function markAsUsed()
     {
-        $this->status =  TicketStatus::USED;
+        $this->status = TicketStatus::USED;
         $this->save();
     }
 
     public function markAsRefunded()
     {
-        $this->status =  TicketStatus::REFUNDED;
+        $this->status = TicketStatus::REFUNDED;
         $this->save();
     }
 
     public function markAsCancelled()
     {
-        $this->status =  TicketStatus::CANCELLED;
+        $this->status = TicketStatus::CANCELLED;
         $this->save();
     }
 
     public function markAsValid()
     {
-        $this->status =  TicketStatus::VALID;
+        $this->status = TicketStatus::VALID;
         $this->save();
     }
 
     public function markAsRefundedAndUpdateAmount($amount)
     {
-        $this->status =  TicketStatus::REFUNDED;
+        $this->status = TicketStatus::REFUNDED;
         $this->amount = $amount;
         $this->save();
     }

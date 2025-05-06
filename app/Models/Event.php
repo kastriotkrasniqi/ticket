@@ -4,9 +4,8 @@ namespace App\Models;
 
 use App\Enums\TicketStatus;
 use App\Enums\WaitingStatus;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
 class Event extends Model
@@ -34,6 +33,7 @@ class Event extends Model
     }
 
     protected ?int $purchasedCountCache = null;
+
     protected ?int $activeOffersCache = null;
 
     public function user()
@@ -79,6 +79,7 @@ class Event extends Model
     public function isEventOwner(?User $user = null): bool
     {
         $user ??= Auth::user();
+
         return $this->user_id === $user?->id;
     }
 
@@ -98,6 +99,7 @@ class Event extends Model
     public function userTicket(?User $user = null): ?Ticket
     {
         $user ??= Auth::user();
+
         return $this->tickets()
             ->where('user_id', $user?->id)
             ->first();
@@ -106,7 +108,9 @@ class Event extends Model
     public function queuePosition(?User $user = null): ?WaitingListEntry
     {
         $user ??= Auth::user();
-        if (!$user) return null;
+        if (! $user) {
+            return null;
+        }
 
         $entry = $this->waitingListEntries()
             ->where('status', '!=', WaitingStatus::EXPIRED)

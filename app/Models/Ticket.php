@@ -21,7 +21,7 @@ class Ticket extends Model
         'amount',
     ];
 
-        /**
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>

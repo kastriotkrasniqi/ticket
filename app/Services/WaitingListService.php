@@ -2,12 +2,12 @@
 
 namespace App\Services;
 
+use App\Enums\WaitingStatus;
+use App\Jobs\ExpireWaitingListOffer;
 use App\Jobs\IssueNextWaitingListOffer;
 use App\Models\Event;
 use App\Models\User;
-use App\Enums\WaitingStatus;
 use App\Models\WaitingListEntry;
-use App\Jobs\ExpireWaitingListOffer;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -56,12 +56,10 @@ class WaitingListService
             return [
                 'entry' => $entry,
                 'status' => WaitingStatus::OFFERED,
-                'message' => 'Ticket reserved – you have ' . config('tickets.offer_expire_minutes') . ' minutes to purchase it.',
+                'message' => 'Ticket reserved – you have '.config('tickets.offer_expire_minutes').' minutes to purchase it.',
             ];
         });
     }
-
-
 
     public static function release(Event $event, User $user, string $status): array
     {
@@ -70,7 +68,7 @@ class WaitingListService
             ->where('status', $status)
             ->first();
 
-        if (!$entry) {
+        if (! $entry) {
             throw ValidationException::withMessages([
                 'waiting_list' => 'No active offer to release.',
             ]);
@@ -89,5 +87,4 @@ class WaitingListService
 
         return ['message' => 'Offer released'];
     }
-
 }

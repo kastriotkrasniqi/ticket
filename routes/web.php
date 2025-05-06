@@ -1,11 +1,10 @@
 <?php
 
-use Inertia\Inertia;
-use App\Events\WaitingStatusUpdate;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\WaitingListController;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 Route::get('/', function () {
     return redirect('events');
@@ -17,7 +16,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 });
 
-
 Route::resource('events', EventController::class);
 
 Route::post('events/{event}/join-waiting-list', [WaitingListController::class, 'joinWaitingList'])
@@ -25,9 +23,7 @@ Route::post('events/{event}/join-waiting-list', [WaitingListController::class, '
 
 Route::post('/events/{event}/release-offer', [WaitingListController::class, 'releaseOffer'])->name('events.release-offer');
 
-
-
 Route::resource('tickets', TicketController::class);
 
-require __DIR__ . '/settings.php';
-require __DIR__ . '/auth.php';
+require __DIR__.'/settings.php';
+require __DIR__.'/auth.php';

@@ -2,13 +2,13 @@
 
 namespace Database\Seeders;
 
-use Carbon\Carbon;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use App\Models\User;
 use App\Models\Event;
+// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\Ticket;
-use Illuminate\Database\Seeder;
+use App\Models\User;
 use App\Models\WaitingListEntry;
+use Carbon\Carbon;
+use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -30,7 +30,7 @@ class DatabaseSeeder extends Seeder
         WaitingListEntry::factory(25)->create([
             'event_id' => 21,
             'user_id' => User::factory(),
-            'status'=> 'offered',
+            'status' => 'offered',
             'expires_at' => Carbon::now()->addMinutes(30)->timestamp,
         ]);
     }
