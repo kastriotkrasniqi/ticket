@@ -9,9 +9,11 @@ use App\Models\WaitingListEntry;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class ExpireOfferJob implements ShouldQueue
+class ExpireWaitingListOffer implements ShouldQueue
 {
     use Queueable;
+
+    public $queue = 'offers';
 
     /**
      * Create a new job instance.
@@ -32,6 +34,6 @@ class ExpireOfferJob implements ShouldQueue
 
         $this->entry->update(['status' => WaitingStatus::EXPIRED]);
 
-        OfferNextInQueueJob::dispatch($this->entry->event_id);
+        IssueNextWaitingListOffer::dispatch($this->entry->event_id);
     }
 }

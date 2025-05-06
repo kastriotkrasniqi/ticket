@@ -5,7 +5,7 @@ namespace App\Jobs;
 use App\Models\User;
 use App\Models\Event;
 use App\Enums\WaitingStatus;
-use App\Jobs\ExpireOfferJob;
+use App\Jobs\ExpireWaitingListOffer;
 use App\Models\WaitingListEntry;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -36,7 +36,7 @@ class JoinWaitingList implements ShouldQueue
             ]);
 
             // Schedule a job to expire this offer after the offer duration
-            ExpireOfferJob::dispatch($this->event, $this->user)
+            ExpireWaitingListOffer::dispatch($this->event, $this->user)
                 ->delay(now()->addMinutes(config('tickets.offer_expire_minutes')->timestamp));
 
         } else {

@@ -22,6 +22,7 @@ class WaitingListEntry extends Model
 
     protected $casts = [
         'status' => WaitingStatus::class,
+        'expires_at' => 'datetime'
     ];
 
     public function event(): BelongsTo

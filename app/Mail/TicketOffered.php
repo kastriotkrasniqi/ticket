@@ -12,14 +12,17 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class TicketOffered extends Mailable
+class TicketOffered extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
+
+    public $afterCommit = true;
+
 
     /**
      * Create a new message instance.
      */
-    public function __construct(public User $user, public int $event_id, public int $expires_at)
+    public function __construct(public User $user, public int $event_id, public Carbon $expires_at)
     {
         //
     }

@@ -2,22 +2,24 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Jobs\IssueOfferJob;
 use App\Enums\WaitingStatus;
-use App\Jobs\ExpireOfferJob;
 use Illuminate\Http\Request;
 use App\Models\WaitingListEntry;
-use App\Jobs\OfferNextInQueueJob;
 use App\Events\QueueStatusUpdated;
 use Illuminate\Support\Facades\DB;
 use App\Events\WaitingStatusUpdate;
+use App\Jobs\ExpireWaitingListOffer;
+use App\Services\WaitingListService;
+use App\Jobs\IssueNextWaitingListOffer;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Validation\ValidationException;
 
 class WaitingListController extends Controller
 {
+
     public function joinWaitingList($eventId)
     {
-        $user = auth()->user();
-
         // $key = 'waiting-list-limiter:' . $eventId . ':' . ($user?->id ?? request()->ip());
         // if (RateLimiter::tooManyAttempts($key, 3)) {
         //     $seconds = RateLimiter::availableIn($key);
@@ -27,48 +29,22 @@ class WaitingListController extends Controller
         // }
         // RateLimiter::hit($key, 1800);
 
-        $event = Event::where('id', operator: $eventId)->lockForUpdate()->firstOrFail();
+        $user = auth()->user();
+        $event = Event::where('id', $eventId)->firstOrFail();
 
-        $existing = WaitingListEntry::where('event_id', $event->id)
-            ->where('user_id', $user->id)
-            ->whereIn('status', [WaitingStatus::WAITING, WaitingStatus::OFFERED])
-            ->first();
+        try {
+            $result = WaitingListService::join($event, $user);
 
-        if ($existing) {
-            return response()->json(['message' => 'You are already on the waiting list'], 422);
+            return response()->json([
+                'success' => true,
+                'status' => $result['status'],
+                'message' => $result['message'],
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 422);
         }
-
-        DB::transaction(function () use ($event, $user) {
-
-            if ($event->availableSpots() <= 0) {
-
-                WaitingListEntry::create([
-                    'event_id' => $event->id,
-                    'user_id' => $user->id,
-                    'status' => WaitingStatus::WAITING,
-                ]);
-
-                return response()->json(['message' => 'You have been added to the waiting list for purchasing the ticket','status' => WaitingStatus::WAITING], 200);
-
-            } else {
-
-                 $entry = WaitingListEntry::create([
-                    'event_id' => $event->id,
-                    'user_id' => $user->id,
-                    'expires_at' => now()->addMinutes(config('tickets.offer_expire_minutes'))->timestamp,
-                    'status' => WaitingStatus::OFFERED,
-                ]);
-
-                ExpireOfferJob::dispatch($entry)
-                    ->delay(now()->addMinutes(config('tickets.offer_expire_minutes')));
-            }
-        });
-
-        return response()->json([
-            'success' => true,
-            'status' => WaitingStatus::OFFERED,
-            'message' => "Ticket reserved – you have " . config('tickets.offer_expire_minutes') . " minutes to purchase it",
-        ]);
     }
 
 
@@ -90,7 +66,7 @@ class WaitingListController extends Controller
 
             // If this release creates availability, immediately offer to next
             if ($event->availableSpots() > 0) {
-                OfferNextInQueueJob::dispatch($eventId);
+                IssueNextWaitingListOffer::dispatch($eventId);
             }
 
         } else {
