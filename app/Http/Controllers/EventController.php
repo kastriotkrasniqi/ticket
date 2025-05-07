@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\EventResource;
+use Inertia\Inertia;
 use App\Models\Event;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
+use App\Services\SearchService;
+use App\Http\Resources\EventResource;
 
 class EventController extends Controller
 {
@@ -61,24 +62,9 @@ class EventController extends Controller
     }
 
 
-    public function search($query)
+    public function search($query, SearchService $searchService)
     {
-
-        if (empty($query)) {
-            return response()->json([]);
-        }
-
-        try {
-            $events = Event::search($query)->options([
-                'query_by' => 'name, description'
-            ])->get();
-
-            return response()->json(EventResource::collection($events));
-        } catch (\Throwable $th) {
-            return response()->json(['error' => 'Error occurred while searching.'], 500);
-
-        }
-
+        return $searchService->search($query);
     }
 
 }

@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Enums\WaitingStatus;
 use App\Models\Event;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -16,7 +17,7 @@ class WaitingStatusUpdate implements ShouldBroadcast
     /**
      * Create a new event instance.
      */
-    public function __construct(public int $event, public int $user_id)
+    public function __construct(public WaitingStatus $status, public int $user_id)
     {
         //
     }

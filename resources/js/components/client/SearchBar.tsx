@@ -55,10 +55,8 @@ export function SearchBar() {
 
             setIsSearching(true);
             try {
-                // Make the request to the Laravel API
                 const response = await axios.get(route('events.search', { query: debouncedSearchQuery }));
-                setSearchResults(response.data || []); // Assuming Typesense response structure\
-                console.log(searchResults);
+                setSearchResults(response.data || []);
             } catch (error) {
                 console.error('Error searching events:', error);
                 setSearchResults([]);

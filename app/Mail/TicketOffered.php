@@ -16,7 +16,6 @@ class TicketOffered extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public $afterCommit = true;
 
     /**
      * Create a new message instance.

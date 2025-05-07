@@ -27,13 +27,15 @@ class WaitingListEntry extends Model
         'expires_at' => 'datetime',
     ];
 
+
     protected function expiresAt(): Attribute
     {
         return Attribute::make(
-            get: fn (string $value) => $value,
-            set: fn (string $value) => Carbon::parse($value)->timestamp,
+            get: fn (string $value): ?int => (int) $value,
+            set: fn (string $value): ?int => Carbon::parse($value)->timestamp,
         );
     }
+
 
     public function event(): BelongsTo
     {

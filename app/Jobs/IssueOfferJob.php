@@ -2,14 +2,15 @@
 
 namespace App\Jobs;
 
-use App\Enums\WaitingStatus;
 use App\Mail\TicketOffered;
+use App\Enums\WaitingStatus;
 use App\Models\WaitingListEntry;
+use App\Events\WaitingStatusUpdate;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Mail;
 
 class IssueOfferJob implements ShouldQueue
 {
@@ -28,6 +29,8 @@ class IssueOfferJob implements ShouldQueue
         $this->entry->status = WaitingStatus::OFFERED;
         $this->entry->expires_at = now()->addMinutes(config('tickets.offer_expire_minutes'));
         $this->entry->save();
+
+        broadcast(new WaitingStatusUpdate(WaitingStatus::OFFERED, $this->entry->user_id));
 
         ExpireWaitingListOffer::dispatch($this->entry)
             ->delay(now()->addMinutes(config('tickets.offer_expire_minutes')));
