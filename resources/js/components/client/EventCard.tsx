@@ -8,6 +8,7 @@ export function EventCard({ event }: { event: Event }) {
     const isEventOwner = event.is_owner;
     const queuePosition = event.queue_position;
     const imageUrl = event.image;
+    console.log(event);
 
     const renderQueuePosition = () => {
         if (!queuePosition) return null;
@@ -74,7 +75,7 @@ export function EventCard({ event }: { event: Event }) {
             return (
                 <div className="mt-4">
                     <Link
-                        href={route('events.show', event.id)}
+                        href={route('events.edit', event.id)}
                         as="button"
                         className="flex w-full items-center justify-center gap-2 rounded-lg bg-gray-100 px-6 py-3 font-medium text-gray-700 shadow-sm transition-colors duration-200 hover:bg-gray-200"
                     >

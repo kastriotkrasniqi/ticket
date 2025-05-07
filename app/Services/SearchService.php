@@ -2,13 +2,12 @@
 
 namespace App\Services;
 
-use App\Models\Event;
 use App\Http\Resources\EventResource;
+use App\Models\Event;
 use Illuminate\Support\Facades\Config;
 
 class SearchService
 {
-
     public function search(string $query): \Illuminate\Http\JsonResponse
     {
         if (empty($query)) {
@@ -34,7 +33,7 @@ class SearchService
     protected function typesenseSearch(string $query)
     {
         return Event::search($query)->options([
-            'query_by' => 'name, description'
+            'query_by' => 'name, description', 'location',
         ])->get();
     }
 
@@ -42,6 +41,7 @@ class SearchService
     {
         return Event::where('name', 'like', "%{$query}%")
             ->orWhere('description', 'like', "%{$query}%")
+            ->orWhere('location', 'like', "%{$query}%")
             ->get();
     }
 }

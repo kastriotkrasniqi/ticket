@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Inertia\Inertia;
-use App\Models\Event;
-use Illuminate\Http\Request;
-use App\Services\SearchService;
 use App\Http\Resources\EventResource;
+use App\Models\Event;
+use App\Services\SearchService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
 
 class EventController extends Controller
 {
@@ -15,7 +16,7 @@ class EventController extends Controller
      */
     public function index(Request $request)
     {
-        $events = Event::paginate(5);
+        $events = Event::orderBy('date', 'DESC')->paginate(5);
 
         return Inertia::render('Events/Index', [
             'events' => Inertia::merge(function () use ($events) {
@@ -31,7 +32,44 @@ class EventController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request) {}
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'location' => 'required|string|max:255',
+            'date' => 'required|date',
+            'price' => 'required|numeric|min:0',
+            'total_tickets' => 'required|integer|min:1',
+            'image' => 'required|image|max:2048',
+        ]);
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('events', 'public');
+            $validated['image'] = Storage::url($path);
+        }
+
+        $validated['user_id'] = auth()->user()->id;
+
+        // Create the event
+        $event = Event::create($validated);
+
+        return redirect()->route('events.show', $event)
+            ->with('success', 'Event created successfully!');
+    }
+
+    public function create()
+    {
+        return Inertia::render('Events/Create');
+    }
+
+    public function edit(Event $event)
+    {
+        return Inertia::render('Events/Create', [
+            'event' => new EventResource($event),
+        ]);
+    }
 
     /**
      * Display the specified resource.
@@ -61,10 +99,8 @@ class EventController extends Controller
         //
     }
 
-
     public function search($query, SearchService $searchService)
     {
         return $searchService->search($query);
     }
-
 }

@@ -37,6 +37,6 @@ return [
 
     'typesense' => [
         'enabled' => env('TYPESENSE_ENABLED', false),
-    ]
+    ],
 
 ];

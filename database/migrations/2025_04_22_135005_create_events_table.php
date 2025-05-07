@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('description');
             $table->string('location');
-            $table->integer('date');
+            $table->date('date');
             $table->integer('price');
             $table->integer('total_tickets');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');

@@ -12,7 +12,7 @@ use Laravel\Scout\Searchable;
 class Event extends Model
 {
     use HasFactory;
-    use Searchable;
+    // use Searchable;
 
     protected ?int $purchasedCountCache = null;
 
@@ -34,10 +34,9 @@ class Event extends Model
     {
         return [
             'is_canceled' => 'boolean',
-            'date' => 'datetime',
+            'date' => 'datetime:Y-m-d',
         ];
     }
-
 
     public function toSearchableArray()
     {
@@ -51,8 +50,6 @@ class Event extends Model
             'created_at' => $this->created_at->timestamp,
         ];
     }
-
-
 
     public function user()
     {

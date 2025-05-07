@@ -16,7 +16,6 @@ class TicketOffered extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-
     /**
      * Create a new message instance.
      */

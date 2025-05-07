@@ -45,7 +45,7 @@ export function Header() {
                 <Link href="/my-tickets">My Tickets</Link>
               </Button>
               <Button variant="default" asChild>
-                <Link href="/sell-tickets">Sell Tickets</Link>
+                <Link href={route("events.create")}>Sell Tickets</Link>
               </Button>
             </div>
 
@@ -79,7 +79,7 @@ export function Header() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem className="md:hidden">
-                  <Link href="/sell-tickets" className="flex w-full">
+                  <Link href={route('events.create')} className="flex w-full">
                     Sell Tickets
                   </Link>
                 </DropdownMenuItem>

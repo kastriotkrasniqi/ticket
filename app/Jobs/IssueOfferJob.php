@@ -2,15 +2,15 @@
 
 namespace App\Jobs;
 
-use App\Mail\TicketOffered;
 use App\Enums\WaitingStatus;
-use App\Models\WaitingListEntry;
 use App\Events\WaitingStatusUpdate;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
+use App\Mail\TicketOffered;
+use App\Models\WaitingListEntry;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Mail;
 
 class IssueOfferJob implements ShouldQueue
 {
