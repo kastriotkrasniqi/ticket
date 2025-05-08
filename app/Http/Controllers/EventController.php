@@ -16,7 +16,7 @@ class EventController extends Controller
      */
     public function index(Request $request)
     {
-        $events = Event::orderBy('date', 'DESC')->paginate(5);
+        $events = Event::orderBy('date', 'DESC')->paginate(10);
 
         return Inertia::render('Events/Index', [
             'events' => Inertia::merge(function () use ($events) {
@@ -86,10 +86,32 @@ class EventController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Event $event)
+    public function update(Request $request, $eventId)
     {
-        //
+        $event = Event::findOrFail($eventId);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'location' => 'required|string|max:255',
+            'date' => 'required|date',
+            'price' => 'required|numeric|min:0',
+            'total_tickets' => 'required|integer|min:1',
+            // 'image' => 'nullable|image|max:2048', // Uncomment if you want to validate a new image
+        ]);
+
+        // Handle image upload if a new image is provided
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('events', 'public');
+            $validated['image'] = Storage::url($path);
+        }
+
+        $event->update($validated);
+
+        return redirect()->route('events.show', $event)
+            ->with('message', 'Event updated successfully!');
     }
+
 
     /**
      * Remove the specified resource from storage.

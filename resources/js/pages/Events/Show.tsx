@@ -6,7 +6,7 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/client/app-layout';
 import { type Event } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head,router } from '@inertiajs/react';
 import { AlertCircleIcon, ArrowLeftIcon, CalendarIcon, MapPinIcon, TicketIcon, UserIcon } from 'lucide-react';
 
 export default function Show({ event }: { event: Event }) {
@@ -18,7 +18,6 @@ export default function Show({ event }: { event: Event }) {
         );
     }
 
-    console.log(event);
 
     return (
         <AppLayout>
@@ -26,7 +25,7 @@ export default function Show({ event }: { event: Event }) {
 
             <div className="px-8 py-8">
                 {/* Back Button */}
-                <Button variant="ghost" className="mb-6 pl-0" onClick={() => window.history.back()}>
+                <Button variant="ghost" className="mb-6 pl-0" onClick={() => router.get(route('events.index'))}>
                     <ArrowLeftIcon className="mr-2 h-4 w-4" />
                     Back to events
                 </Button>

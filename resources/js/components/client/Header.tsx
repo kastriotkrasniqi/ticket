@@ -64,7 +64,7 @@ export function Header() {
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
-                  <Link href="/profile" className="flex w-full">
+                  <Link href={route("profile.edit")} className="flex w-full">
                     Profile
                   </Link>
                 </DropdownMenuItem>

@@ -20,7 +20,7 @@ export default function EventForm({ event }: { event?: any }) {
     name: event?.name || "",
     description: event?.description || "",
     location: event?.location || "",
-    date: new Date(event?.isoDate) || "",
+    date: event?.isoDate || "",
     price: event?.price || "",
     total_tickets: event?.total_tickets || "",
     image: event?.image || null,
@@ -58,8 +58,12 @@ export default function EventForm({ event }: { event?: any }) {
   const handleDateChange = (date: Date | undefined) => {
     setSelectedDate(date)
     if (date) {
-      setData("date", date.toISOString())
-    }
+        const year = date.getFullYear()
+        const month = String(date.getMonth() + 1).padStart(2, "0") // JS months are 0-indexed
+        const day = String(date.getDate()).padStart(2, "0")
+        const formattedDate = `${year}-${month}-${day}`
+        setData("date", formattedDate)
+      }
   }
 
   const handleSubmit = (e: FormEvent) => {

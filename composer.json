@@ -17,6 +17,7 @@
         "laravel/scout": "^10.14",
         "laravel/tinker": "^2.10.1",
         "predis/predis": "^2.0",
+        "stripe/stripe-php": "^17.2",
         "tightenco/ziggy": "^2.4",
         "typesense/typesense-php": "^5.1"
     },
