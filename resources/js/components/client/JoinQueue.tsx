@@ -5,9 +5,10 @@ import { Button } from '@/components/ui/button';
 import { type Event, SharedData } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import axios from 'axios';
-import { Clock, OctagonXIcon, XCircle, Loader2 } from 'lucide-react';
+import { Clock, Loader2, OctagonXIcon, XCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { PurchaseTicket } from './PurchaseTicket';
 
 export function JoinQueue({ event }: { event: Event }) {
     const { auth } = usePage<SharedData>().props;
@@ -18,15 +19,13 @@ export function JoinQueue({ event }: { event: Event }) {
     const expiresAt = event.queue_position?.expires_at ? event.queue_position.expires_at * 1000 : null;
     const isOfferExpired: boolean | undefined = expiresAt !== null && expiresAt !== 0 ? Date.now() > expiresAt : undefined;
 
-
-    // Listen for real-time updates if in queue
     useEffect(() => {
         if (!auth?.user?.id) return;
 
         const channelName = `App.Models.User.${auth.user.id}`;
         const channel = window.Echo.private(channelName);
 
-        if (event?.queue_position?.status === 'waiting') {
+        if (event?.queue_position?.status === 'waiting' || event?.queue_position?.status === 'offered') {
             channel.listen('WaitingStatusUpdate', (e: any) => {
                 console.log('Received update:', e);
                 try {
@@ -43,6 +42,8 @@ export function JoinQueue({ event }: { event: Event }) {
         };
     }, [auth?.user?.id, event?.queue_position?.status]);
 
+
+
     // Timer logic for offered ticket
     useEffect(() => {
         const updateTime = () => {
@@ -57,10 +58,7 @@ export function JoinQueue({ event }: { event: Event }) {
             const minutes = Math.floor(diff / 1000 / 60);
             const seconds = Math.floor((diff / 1000) % 60);
 
-            const timeStr =
-                minutes > 0
-                    ? `${minutes}m ${seconds}s`
-                    : `${seconds}s`;
+            const timeStr = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
 
             setTimeRemaining(timeStr);
         };
@@ -103,11 +101,6 @@ export function JoinQueue({ event }: { event: Event }) {
             .finally(() => setLoading(false));
     };
 
-    const handlePurchaseTicket = () => {
-        // TODO: Implement actual checkout logic
-        toast('Redirecting to purchase... (not implemented)');
-    };
-
     if (!event) return <Spinner />;
 
     if (event.is_owner) return <Message icon={<OctagonXIcon />} text="You cannot buy a ticket for your own event" />;
@@ -132,11 +125,11 @@ export function JoinQueue({ event }: { event: Event }) {
                 <p className="text-foreground text-sm font-medium">
                     🎟️ You have an offer! Time left: <span className="font-bold">{timeRemaining}</span>
                 </p>
-                <Button className="w-full" onClick={handlePurchaseTicket} disabled={isOfferExpired}>
-                    {isOfferExpired ? 'Offer expired' : 'Purchase Ticket'}
-                </Button>
+
+                <PurchaseTicket isOfferExpired={isOfferExpired} eventId={event.id} />
+
                 <Button variant="destructive" className="w-full" onClick={() => handleReleaseOffer('offered')}>
-                    <XCircle className="h-4 w-4 mr-1" />
+                    <XCircle className="mr-1 h-4 w-4" />
                     Release Offer
                 </Button>
             </div>
@@ -153,7 +146,7 @@ export function JoinQueue({ event }: { event: Event }) {
                     Waiting...
                 </Button>
                 <Button variant="outline" className="w-full" onClick={() => handleReleaseOffer('waiting')} disabled={loading}>
-                    {loading && <Loader2 className="animate-spin h-4 w-4 mr-1" />}
+                    {loading && <Loader2 className="mr-1 h-4 w-4 animate-spin" />}
                     Leave the waiting list
                 </Button>
             </div>
@@ -169,7 +162,7 @@ export function JoinQueue({ event }: { event: Event }) {
                 <Button onClick={handleJoinQueue} variant="default" className="w-full" disabled={loading}>
                     {loading ? (
                         <>
-                            <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                             Joining queue...
                         </>
                     ) : (
@@ -185,7 +178,7 @@ export function JoinQueue({ event }: { event: Event }) {
             <Button onClick={handleJoinQueue} variant="default" className="w-full" disabled={loading}>
                 {loading ? (
                     <>
-                        <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Joining queue...
                     </>
                 ) : (

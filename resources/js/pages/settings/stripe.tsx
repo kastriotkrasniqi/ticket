@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import type { BreadcrumbItem } from '@/types';
-import { router,Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -29,8 +29,9 @@ interface StripeSetupProps {
         email: string;
         payouts_enabled: boolean;
         charges_enabled: boolean;
-        company: {
-            name: string;
+        individual: {
+            first_name: string;
+            last_name: string;
         };
         requirements?: {
             current_deadline: number;
@@ -78,7 +79,21 @@ export default function StripeSetup({ isConnected = false, stripeAccount }: Stri
                         <Card>
                             <CardHeader>
                                 <CardTitle className="flex items-center">
-                                    <img src="https://www.vectorlogo.zone/logos/stripe/stripe-icon.svg" alt="Stripe" className="mr-2 h-6" />
+                                    <svg
+                                        aria-hidden="true"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 32 32"
+                                        className="as-x as-y as-z as-10 as-9g as-12 as-13 as-9l ⚙1dh787r mr-2 h-6 w-6 rounded-full"
+                                    >
+                                        <g fill="none" fill-rule="evenodd">
+                                            <path fill="#6772E5" d="M0 0h32v32H0z"></path>
+                                            <path
+                                                fill="#FFF"
+                                                fill-rule="nonzero"
+                                                d="M14.56 12.33c0-.78.64-1.08 1.7-1.08 1.52 0 3.43.46 4.95 1.28v-4.7c-1.66-.65-3.3-.91-4.95-.91-4.05 0-6.75 2.11-6.75 5.65 0 5.5 7.59 4.63 7.59 7 0 .92-.8 1.22-1.92 1.22-1.65 0-3.77-.68-5.45-1.6v4.75c1.86.8 3.74 1.14 5.45 1.14 4.15 0 7-2.05 7-5.63-.01-5.94-7.62-4.89-7.62-7.12z"
+                                            ></path>
+                                        </g>
+                                    </svg>
                                     Connect with Stripe
                                 </CardTitle>
                                 <CardDescription>
@@ -125,7 +140,21 @@ export default function StripeSetup({ isConnected = false, stripeAccount }: Stri
                             <CardHeader>
                                 <div className="flex items-center justify-between">
                                     <CardTitle className="flex items-center">
-                                        <img src="https://www.vectorlogo.zone/logos/stripe/stripe-icon.svg" alt="Stripe" className="mr-2 h-6" />
+                                        <svg
+                                            aria-hidden="true"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 32 32"
+                                            className="as-x as-y as-z as-10 as-9g as-12 as-13 as-9l ⚙1dh787r mr-2 h-6 w-6 rounded-full"
+                                        >
+                                            <g fill="none" fill-rule="evenodd">
+                                                <path fill="#6772E5" d="M0 0h32v32H0z"></path>
+                                                <path
+                                                    fill="#FFF"
+                                                    fill-rule="nonzero"
+                                                    d="M14.56 12.33c0-.78.64-1.08 1.7-1.08 1.52 0 3.43.46 4.95 1.28v-4.7c-1.66-.65-3.3-.91-4.95-.91-4.05 0-6.75 2.11-6.75 5.65 0 5.5 7.59 4.63 7.59 7 0 .92-.8 1.22-1.92 1.22-1.65 0-3.77-.68-5.45-1.6v4.75c1.86.8 3.74 1.14 5.45 1.14 4.15 0 7-2.05 7-5.63-.01-5.94-7.62-4.89-7.62-7.12z"
+                                                ></path>
+                                            </g>
+                                        </svg>
                                         Stripe Account
                                     </CardTitle>
                                     <StatusBadge status="active">Connected</StatusBadge>
@@ -141,7 +170,9 @@ export default function StripeSetup({ isConnected = false, stripeAccount }: Stri
                                         </div>
                                         <div>
                                             <p className="text-muted-foreground text-sm font-medium">Account Name</p>
-                                            <p className="text-sm">{stripeAccount?.company?.name}</p>
+                                            <p className="text-sm">
+                                                {stripeAccount?.individual?.first_name} {stripeAccount?.individual?.last_name}
+                                            </p>
                                         </div>
                                         <div>
                                             <p className="text-muted-foreground text-sm font-medium">Email</p>
@@ -162,16 +193,34 @@ export default function StripeSetup({ isConnected = false, stripeAccount }: Stri
                                     </div>
                                 </div>
 
-                                {stripeAccount?.requirements && stripeAccount.requirements.currently_due.length > 0 && (
-                                    <Alert variant="default">
-                                        <AlertCircle className="h-4 w-4" />
-                                        <AlertTitle>Setup Incomplete</AlertTitle>
-                                        <AlertDescription>
-                                            You still need to complete the following steps to finish setting up your Stripe account:
-                                            <ul className="space-y-2 mt-2 text-sm">{renderRequirements(stripeAccount.requirements.currently_due)}</ul>
-                                        </AlertDescription>
-                                    </Alert>
-                                )}
+                                {stripeAccount?.requirements &&
+                                    (stripeAccount.requirements.currently_due.length > 0 || stripeAccount.requirements.eventually_due.length > 0) && (
+                                        <div className="rounded-lg border  bg-white p-4">
+                                            <h3 className="mb-3 text-sm font-medium ">Required Information</h3>
+
+                                            {stripeAccount.requirements.currently_due.length > 0 && (
+                                                <div className="mb-3">
+                                                    <p className="mb-2 font-medium ">Action Required:</p>
+                                                    <ul className="list-disc pl-5 text-sm text-red-600">
+                                                        {stripeAccount.requirements.currently_due.map((req) => (
+                                                            <li key={req}>{req.replace(/_/g, ' ')}</li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
+
+                                            {stripeAccount.requirements.eventually_due.length > 0 && (
+                                                <div>
+                                                    <p className="mb-2 font-medium ">Eventually Needed:</p>
+                                                    <ul className="list-disc pl-5 text-sm text-red-600">
+                                                        {stripeAccount.requirements.eventually_due.map((req) => (
+                                                            <li key={req}>{req.replace(/_/g, ' ')}</li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
 
                                 {stripeAccount ? (
                                     stripeAccount.payouts_enabled || stripeAccount.charges_enabled ? (
@@ -188,20 +237,30 @@ export default function StripeSetup({ isConnected = false, stripeAccount }: Stri
                                             </Button>
                                         </div>
                                     ) : (
-                                        <div className="flex items-center justify-between rounded-lg border p-6 bg-white  transition-all duration-200">
-                                        <div className="flex flex-col">
-                                            <p className="text-md font-medium text-gray-800">Complete Account Setup</p>
-                                            <p className="text-sm text-gray-500 mt-1">Finish setting up your account to start receiving payments.</p>
+                                        <div className="flex items-center justify-between rounded-lg border bg-white p-6 transition-all duration-200">
+                                            <div className="flex flex-col">
+                                                <p className="text-md font-medium text-gray-800">Complete Account Setup</p>
+                                                <p className="mt-1 text-sm text-gray-500">
+                                                    Finish setting up your account to start receiving payments.
+                                                </p>
+                                            </div>
+                                            <Button
+                                                variant="outline"
+                                                className="text-primary border-primary flex items-center gap-2 transition-all duration-300"
+                                                asChild
+                                            >
+                                                <Link
+                                                    href={route('stripe.account-link')}
+                                                    method="post"
+                                                    target="_blank"
+                                                    as="button"
+                                                    rel="noopener noreferrer"
+                                                >
+                                                    <span className="text-sm font-medium">Complete Setup</span>
+                                                    <ExternalLink className="text-primary ml-1 h-4 w-4" />
+                                                </Link>
+                                            </Button>
                                         </div>
-                                        <Button variant="outline" className="flex items-center gap-2 text-primary border-primary  transition-all duration-300" asChild>
-                                            <Link href={route('stripe.account-link')} method='post' target="_blank" as="button" rel="noopener noreferrer">
-
-                                                <span className="text-sm font-medium">Complete Setup</span>
-                                                <ExternalLink className="ml-1 h-4 w-4 text-primary" />
-                                            </Link>
-                                        </Button>
-                                    </div>
-
                                     )
                                 ) : null}
                             </CardContent>

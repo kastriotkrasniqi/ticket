@@ -19,7 +19,7 @@ return new class extends Migration
             $table->timestamp('expires_at')->nullable();
             $table->timestamps();
 
-            $table->unique(['user_id', 'event_id', 'status']);
+            // $table->unique(['user_id', 'event_id', 'status']);
             $table->index(['event_id', 'status', 'created_at']);
             $table->index(['event_id', 'user_id', 'status']);
 

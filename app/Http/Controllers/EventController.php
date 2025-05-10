@@ -44,7 +44,6 @@ class EventController extends Controller
             'image' => 'required|image|max:2048',
         ]);
 
-        // Handle image upload
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('events', 'public');
             $validated['image'] = Storage::url($path);
@@ -52,7 +51,6 @@ class EventController extends Controller
 
         $validated['user_id'] = auth()->user()->id;
 
-        // Create the event
         $event = Event::create($validated);
 
         return redirect()->route('events.show', $event)
@@ -100,7 +98,6 @@ class EventController extends Controller
             // 'image' => 'nullable|image|max:2048', // Uncomment if you want to validate a new image
         ]);
 
-        // Handle image upload if a new image is provided
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('events', 'public');
             $validated['image'] = Storage::url($path);

@@ -45,6 +45,12 @@ Route::prefix('/stripe')->middleware(['auth'])->group(function () {
 });
 
 
+Route::post('/stripe/webhook', [StripeController::class, 'webhook'])->name('stripe.webhook');
+
+Route::post('/purchase-ticket', \App\Http\Controllers\PurchaseTicketController::class)->middleware('auth')->name('events.purchase-ticket');
+
+
+
 
 
 

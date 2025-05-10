@@ -4,8 +4,10 @@ namespace App\Services;
 
 use Stripe\Stripe;
 use Stripe\Account;
+use App\Models\Event;
 use Stripe\AccountLink;
 use Stripe\PaymentIntent;
+use Stripe\Checkout\Session;
 
 class StripeConnectService
 {
@@ -16,15 +18,21 @@ class StripeConnectService
 
     public function createExpressAccount(string $email): Account
     {
-        return Account::create([
-            'type' => 'express',
-            'country' => 'US',
-            'email' => $email,
-            'capabilities' => [
-                'card_payments' => ['requested' => true],
-                'transfers' => ['requested' => true],
-            ],
-        ]);
+        return Account::create(
+            [
+                'controller' => [
+                    'stripe_dashboard' => [
+                        'type' => 'express',
+                    ],
+                    'fees' => [
+                        'payer' => 'application'
+                    ],
+                    'losses' => [
+                        'payments' => 'application'
+                    ],
+                ],
+            ]
+        );
     }
 
     public function createOnboardingLink(string $accountId): string
@@ -46,23 +54,47 @@ class StripeConnectService
         return $account->charges_enabled && $account->payouts_enabled;
     }
 
-    public function createPaymentIntent(int $amount, int $fee, string $destinationAccountId): PaymentIntent
+    public function createPaymentIntent(Event $event)
     {
-        return PaymentIntent::create([
-            'amount' => $amount,
-            'currency' => 'usd',
+         $session = Session::create([
             'payment_method_types' => ['card'],
-            'application_fee_amount' => $fee,
-            'transfer_data' => [
-                'destination' => $destinationAccountId,
+            'line_items' => [
+                [
+                    'price_data' => [
+                        'currency' => 'usd',
+                        'product_data' => [
+                            'name' => $event->name,
+                            'description' => $event->description,
+                        ],
+                        'unit_amount' => $event->price * 100,
+                    ],
+                    'quantity' => 1,
+                ]
             ],
+            'expires_at' => now()->addMinutes(30)->timestamp,
+            'payment_intent_data' => [
+                'application_fee_amount' => round($event->price * 100 * 0.01),
+            ],
+            'mode' => 'payment',
+            'success_url' => route('home'),
+            'cancel_url' => route('home'),
+            'metadata' => [
+                'event_id' => $event->id,
+                'user_id' => auth()->id(),
+            ],
+        ], [
+            'stripe_account' => $event->user->stripe_id, // ✅ connect to seller's account
+        ]);
+
+        return response()->json([
+            'url' => $session->url,
         ]);
     }
 
 
     public function getAccount(string $accountId): Account
-{
-    return Account::retrieve($accountId);
-}
+    {
+        return Account::retrieve($accountId);
+    }
 
 }

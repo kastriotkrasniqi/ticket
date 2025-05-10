@@ -4,8 +4,11 @@ namespace App\Jobs;
 
 use App\Enums\WaitingStatus;
 use App\Models\WaitingListEntry;
-use Illuminate\Contracts\Queue\ShouldQueue;
+use App\Events\WaitingStatusUpdate;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 class ExpireWaitingListOffer implements ShouldQueue
 {
@@ -31,6 +34,11 @@ class ExpireWaitingListOffer implements ShouldQueue
         $this->entry->status = WaitingStatus::EXPIRED;
         $this->entry->save();
 
+        broadcast(new WaitingStatusUpdate(WaitingStatus::EXPIRED, $this->entry->user_id));
+
         IssueNextWaitingListOffer::dispatch($this->entry->event_id);
     }
+
+
+
 }
