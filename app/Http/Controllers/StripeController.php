@@ -73,23 +73,7 @@ class StripeController extends Controller
     }
 
 
-    public function generateAccountLink(StripeConnectService $stripe)
-    {
-        $user = auth()->user();
 
-        try {
-            if ($user->stripe_id) {
-                $url = $stripe->createOnboardingLink($user->stripe_id);
-                return Inertia::location($url);
-            }
-        } catch (\Exception $e) {
-
-            session()->flash('flash', $e->getMessage());
-            return Inertia::location(route('stripe.onboard'));
-        }
-
-
-    }
 
 
     public function webhook(Request $request)

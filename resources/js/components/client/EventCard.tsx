@@ -1,6 +1,6 @@
 import { type Event, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { CalendarDays, Check, CircleArrowRight, LoaderCircle, MapPin, PencilIcon, StarIcon, Ticket, XCircle } from 'lucide-react';
+import { CalendarDays, CircleArrowRight, Edit, LoaderCircle, MapPin, Ticket } from 'lucide-react';
 
 export function EventCard({ event }: { event: Event }) {
     const { auth } = usePage<SharedData>().props;
@@ -14,186 +14,147 @@ export function EventCard({ event }: { event: Event }) {
         if (!queuePosition) return null;
 
         const isSoldOut = event.purchased_count >= event.total_tickets;
-        const isEventCanceled = event.is_canceled;
-        const isNextInLine = queuePosition.position === 2;
+        const expiresAt = event.queue_position?.expires_at ? event.queue_position.expires_at * 1000 : null;
+        const isOfferExpired: boolean | undefined = expiresAt !== null && expiresAt !== 0 ? Date.now() > expiresAt : undefined;
+
 
         if (isSoldOut) {
-            return <QueueStatus status="sold-out" message="Event is sold out" />;
-        }
-
-        if (isEventCanceled) {
-            return <QueueStatus status="canceled" message="Event is canceled" />;
-        }
-
-        if (isNextInLine) {
             return (
-                <QueueStatus
-                    status="next"
-                    message={`You're next in line! (Queue position: ${queuePosition.position})`}
-                    extra={
-                        <div className="flex items-center">
-                            <LoaderCircle className="mr-1 h-4 w-4 animate-spin text-amber-500" />
-                            <span className="text-sm text-amber-600">Waiting for ticket</span>
-                        </div>
-                    }
-                />
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                    <div className="flex items-center">
+                        <Ticket className="w-5 h-5 text-gray-400 mr-2" />
+                        <span className="text-gray-600">Event is sold out</span>
+                    </div>
+                </div>
+            );
+        }
+
+        if(isOfferExpired) {
+            return (
+                 <div className="rounded-lg border border-amber-200 bg-amber-50 p-2 ">
+                    <p className="flex items-center gap-2 text-amber-700">
+                        <span className="text-xl">🎟️</span>
+                        <span className="font-medium">Ticket offer: Expired </span>
+                    </p>
+                </div>
+            );
+        }
+
+
+
+        if (queuePosition.position === 2) {
+            return (
+                <div className="flex flex-col lg:flex-row items-center justify-between p-3 bg-amber-50 rounded-lg border border-amber-100">
+                    <div className="flex items-center">
+                        <CircleArrowRight className="w-5 h-5 text-amber-500 mr-2" />
+                        <span className="text-amber-700 font-medium">
+                            You're next in line! (Queue position: {queuePosition.position})
+                        </span>
+                    </div>
+                    <div className="flex items-center">
+                        <LoaderCircle className="w-4 h-4 mr-1 animate-spin text-amber-500" />
+                        <span className="text-amber-600 text-sm">Waiting for ticket</span>
+                    </div>
+                </div>
             );
         }
 
         return (
-            <QueueStatus
-                status="in-queue"
-                message="Queue position"
-                extra={<span className="rounded-full bg-blue-100 px-3 py-1 font-medium text-blue-700">#{queuePosition.position}</span>}
-            />
-        );
-    };
-
-    const QueueStatus = ({ status, message, extra }: { status: 'sold-out' | 'canceled' | 'next' | 'in-queue', message: string, extra?: any }) => {
-        const statusStyles = {
-            'sold-out': 'bg-gray-50 text-gray-600',
-            'canceled': 'bg-gray-50 text-gray-600',
-            'next': 'bg-amber-50 text-amber-700',
-            'in-queue': 'bg-blue-50 text-blue-700',
-        };
-
-        return (
-            <div className={`flex items-center justify-between rounded-lg border border-${statusStyles[status]} p-3`}>
+            <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-100">
                 <div className="flex items-center">
-                    <Ticket className="mr-2 h-5 w-5" />
-                    <span className="font-medium">{message}</span>
+                    <LoaderCircle className="w-4 h-4 mr-2 animate-spin text-blue-500" />
+                    <span className="text-blue-700">Queue position</span>
                 </div>
-                {extra}
+                <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-medium">
+                    #{queuePosition.position}
+                </span>
             </div>
         );
     };
 
-    const renderTicketStatus = () => {
-        if (!auth.user) return null;
-
-        if (isEventOwner) {
-            return (
-                <div className="mt-4">
-                    <Link
-                        href={route('events.edit', event.id)}
-                        as="button"
-                        className="flex w-full items-center justify-center gap-2 rounded-lg bg-gray-100 px-6 py-3 font-medium text-gray-700 shadow-sm transition-colors duration-200 hover:bg-gray-200"
-                    >
-                        <PencilIcon className="h-5 w-5" />
-                        Edit Event
-                    </Link>
-                </div>
-            );
-        }
-
-        if (event.user_ticket) {
-            return (
-                <div className="mt-4 flex items-center justify-between rounded-lg border border-green-100 bg-green-50 p-3">
-                    <div className="flex items-center">
-                        <Check className="mr-2 h-5 w-5 text-green-600" />
-                        <span className="font-medium text-green-700">You have a ticket!</span>
-                    </div>
-                    <a
-                        href="#"
-                        className="flex items-center gap-1 rounded-full bg-green-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition-colors duration-200 hover:bg-green-700"
-                    >
-                        View your ticket
-                    </a>
-                </div>
-            );
-        }
-
-        if (queuePosition) {
-            return (
-                <div className="mt-4 space-y-2">
-                    {renderQueuePosition()}
-                    {queuePosition.status === 'expired' && (
-                        <div className="rounded-lg border border-red-100 bg-red-50 p-3">
-                            <span className="flex items-center font-medium text-red-700">
-                                <XCircle className="mr-2 h-5 w-5" />
-                                Offer expired
-                            </span>
-                        </div>
-                    )}
-                </div>
-            );
-        }
-
-        return null;
-    };
-
     return (
-        <Link href={route('events.show', event.id)} className="block" as="button">
+        <Link href={route('events.show', event.id)} className="group block" as="button">
             <div
-                className={`group cursor-pointer overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:shadow-md ${
+                className={`relative overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:shadow-lg ${
                     isPastEvent ? 'opacity-75 hover:opacity-100' : ''
                 }`}
             >
                 {/* Event Image */}
-                {imageUrl && (
-                    <div className="relative h-48 w-full">
-                        <img src={imageUrl} alt={event.name} className="h-full w-full object-cover" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                        <div className="absolute top-3 left-3">
-                            {isEventOwner && (
-                                <span className="inline-flex items-center gap-1 rounded-full bg-blue-600 px-2 py-0.5 text-xs font-semibold text-white shadow">
-                                    <StarIcon className="h-3 w-3" />
-                                    Your Event
-                                </span>
-                            )}
-                        </div>
-                        <div className="absolute top-3 right-3 space-y-1 text-right">
-                            {event.is_canceled ? (
-                                <span className="inline-block rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700 shadow">
-                                    Canceled
-                                </span>
-                            ) : event.is_past_event ? (
-                                <span className="inline-block rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700 shadow">
-                                    Past Event
-                                </span>
-                            ) : (
-                                <span className="inline-block rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700 shadow">
-                                    £{event.price.toFixed(2)}
-                                </span>
-                            )}
-                        </div>
+                <div className="relative h-48 w-full">
+                    <img src={imageUrl} alt={`${event.name} event cover`} className="h-full w-full object-cover" loading="lazy" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                    <div className="absolute right-4 bottom-4 left-4">
+                        <h2 className="line-clamp-2 text-xl font-semibold text-white">{event.name}</h2>
                     </div>
-                )}
+                    {/* Status Badges */}
+                    <div className="absolute top-4 right-4 flex flex-col gap-2">
+                        {event.is_canceled ? (
+                            <span className="inline-flex items-center rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700 shadow ring-1 ring-red-200">
+                                Canceled
+                            </span>
+                        ) : event.is_past_event ? (
+                            <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700 shadow ring-1 ring-gray-200">
+                                Past Event
+                            </span>
+                        ) : (
+                            <span className="inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700 shadow ring-1 ring-green-200">
+                                £{event.price.toFixed(2)}
+                            </span>
+                        )}
+                    </div>
+                </div>
 
-                {/* Event Info */}
-                <div className="space-y-4 p-5 text-left">
-                    <h2 className="line-clamp-2 text-xl font-semibold text-gray-900">{event.name}</h2>
-
+                <div className="p-6">
                     <div className="space-y-2 text-sm text-gray-600">
                         <div className="flex items-center gap-2">
-                            <MapPin className="h-4 w-4 text-gray-500" />
+                            <MapPin className="h-4 w-4 flex-shrink-0 text-gray-500" />
                             <span className="truncate">{event.location}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <CalendarDays className="h-4 w-4 text-gray-500" />
+                            <CalendarDays className="h-4 w-4 flex-shrink-0 text-gray-500" />
                             <span>
                                 {event.humanDate} {isPastEvent && <span className="ml-1 text-xs text-gray-500">(Ended)</span>}
                             </span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <Ticket className="h-4 w-4 text-gray-500" />
-
-                            <span>
+                            <Ticket className="h-4 w-4 flex-shrink-0 text-gray-500" />
+                            <span className="flex items-center gap-2">
                                 {!event.is_canceled && !event.is_past_event ? (
-                                    `${event.total_tickets - event.purchased_count} / ${event.total_tickets} available`
+                                    <>
+                                        <span className="truncate">
+                                            {event.total_tickets - event.purchased_count} / {event.total_tickets} available
+                                        </span>
+                                        {event.active_offers > 0 && (
+                                            <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-600 ring-1 ring-amber-200">
+                                                {event.active_offers} trying to buy
+                                            </span>
+                                        )}
+                                    </>
                                 ) : (
                                     <span>Not available</span>
-                                )}
-                                {!event.is_past_event && event.active_offers > 0 && (
-                                    <span className="ml-2 text-xs text-amber-600">({event.active_offers} trying to buy)</span>
                                 )}
                             </span>
                         </div>
                     </div>
 
-                    <p className="line-clamp-3 text-sm text-gray-700">{event.description}</p>
+                    <p className="mt-4 line-clamp-2 text-left text-sm text-gray-700">
+                        {!event.queue_position && !event.is_owner && event.description}
+                    </p>
 
-                    <div onClick={(e) => e.stopPropagation()}>{!isPastEvent && renderTicketStatus()}</div>
+                    {event.is_owner && (
+                        <Link
+                            href={`/events/${event.id}/edit`}
+                            className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 p-3"
+                        >
+                            <div className="flex items-center">
+                                <Edit className="mr-2 h-5 w-5 text-gray-500" />
+                                <span className="font-medium text-gray-700">Edit your event</span>
+                            </div>
+                        </Link>
+                    )}
+
+                    {/* Ticket Status */}
+                    <div onClick={(e) => e.stopPropagation()}>{!isPastEvent && renderQueuePosition()}</div>
                 </div>
             </div>
         </Link>

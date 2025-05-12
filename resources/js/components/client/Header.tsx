@@ -42,7 +42,7 @@ export function Header() {
           <div className="ml-auto flex items-center gap-2">
             <div className="hidden md:flex md:gap-2">
               <Button variant="ghost" asChild>
-                <Link href="/my-tickets">My Tickets</Link>
+                <Link href={route('tickets.index')}>My Tickets</Link>
               </Button>
               <Button variant="default" asChild>
                 <Link href={route("events.create")}>Sell Tickets</Link>

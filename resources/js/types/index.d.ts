@@ -77,6 +77,8 @@ export interface User {
     amount: number
     created_at: string
     updated_at: string
+    purchased_at: string
+    event ?: Event
   }
 
 

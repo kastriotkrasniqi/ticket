@@ -250,8 +250,8 @@ export default function StripeSetup({ isConnected = false, stripeAccount }: Stri
                                                 asChild
                                             >
                                                 <Link
-                                                    href={route('stripe.account-link')}
-                                                    method="post"
+                                                    href={route('stripe.onboard')}
+                                                    method="get"
                                                     target="_blank"
                                                     as="button"
                                                     rel="noopener noreferrer"

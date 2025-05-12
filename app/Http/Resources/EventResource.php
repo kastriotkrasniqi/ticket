@@ -30,7 +30,7 @@ class EventResource extends JsonResource
             'price' => $this->price,
             'total_tickets' => $this->total_tickets,
             'user_id' => $this->user_id,
-            'image' => asset($this->image) ?? 'https://placehold.co/600',
+            'image' => 'https://placehold.co/600',
             'is_canceled' => $this->is_canceled,
             'available' => $this->isAvailable(),
             'available_spots' => $this->availableSpots(),

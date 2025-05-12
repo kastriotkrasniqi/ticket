@@ -121,15 +121,23 @@ export function JoinQueue({ event }: { event: Event }) {
 
     if (event.queue_position?.status === 'offered') {
         return (
-            <div className="space-y-2 text-center">
-                <p className="text-foreground text-sm font-medium">
-                    🎟️ You have an offer! Time left: <span className="font-bold">{timeRemaining}</span>
-                </p>
+            <div className="space-y-4">
+                <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
+                    <p className="flex items-center gap-2 text-amber-700">
+                        <span className="text-2xl">🎟️</span>
+                        <span className="font-medium">Ticket offer expires in: </span>
+                        <span className="font-mono font-bold">{timeRemaining}</span>
+                    </p>
+                </div>
 
                 <PurchaseTicket isOfferExpired={isOfferExpired} eventId={event.id} />
 
-                <Button variant="destructive" className="w-full" onClick={() => handleReleaseOffer('offered')}>
-                    <XCircle className="mr-1 h-4 w-4" />
+                <Button
+                    variant="outline"
+                    className="w-full border-red-200 text-red-700 hover:bg-red-50"
+                    onClick={() => handleReleaseOffer('offered')}
+                >
+                    <XCircle className="mr-2 h-4 w-4" />
                     Release Offer
                 </Button>
             </div>

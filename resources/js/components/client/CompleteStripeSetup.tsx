@@ -10,7 +10,7 @@ const CompleteSetup = () => {
     useEffect(() => {
         const fetchStripeAccountLink = async () => {
             try {
-                const response = await axios.get(route('stripe.account-link'));
+                const response = await axios.get(route('stripe.onboard'));
                 setStripeAccountLinkUrl(response.data.url);
             } catch (error) {
                 console.error('Error fetching Stripe account link:', error);

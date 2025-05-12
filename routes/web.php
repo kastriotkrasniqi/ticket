@@ -27,6 +27,7 @@ Route::post('/events/{event}/release-offer', [WaitingListController::class, 'rel
 Route::get('/search/{query}', [EventController::class, 'search'])->name('events.search');
 
 Route::resource('tickets', TicketController::class);
+Route::get('/tickets/{id}/pdf', [TicketController::class, 'downloadTicket'])->name('ticket.pdf');
 
 
 Route::prefix('/stripe')->middleware(['auth'])->group(function () {
@@ -39,7 +40,7 @@ Route::prefix('/stripe')->middleware(['auth'])->group(function () {
     Route::get('/onboarding/refresh', function () {
         return redirect()->route('stripe.onboard')->with('error', 'Please try onboarding again.');
     })->name('stripe.onboarding.refresh');
-    Route::post('/stripe/account-link', [StripeController::class, 'generateAccountLink'])->name('stripe.account-link');
+
     Route::post('/disconnect', [StripeController::class, 'disconnect'])->name('stripe.disconnect');
 
 });

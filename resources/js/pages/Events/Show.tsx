@@ -23,44 +23,51 @@ export default function Show({ event }: { event: Event }) {
         <AppLayout>
             <Head title={event.name} />
 
-            <div className="px-8 py-8">
+            <div className="mx-auto px-4 py-8 sm:px-6 lg:px-8">
                 {/* Back Button */}
-                <Button variant="ghost" className="mb-6 pl-0" onClick={() => router.get(route('events.index'))}>
+                <Button
+                    variant="ghost"
+                    className="mb-6 -ml-2 text-gray-600 hover:text-gray-900"
+                    onClick={() => router.get(route('events.index'))}
+                >
                     <ArrowLeftIcon className="mr-2 h-4 w-4" />
                     Back to events
                 </Button>
 
                 <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-                    {/* Main Content - 2/3 width on desktop */}
+                    {/* Main Content */}
                     <div className="space-y-6 lg:col-span-2">
-                        {/* Event Status */}
+                        {/* Event Status Banner */}
                         {event.is_canceled && (
-                            <div className="bg-destructive/10 border-destructive text-destructive flex items-center rounded-md border px-4 py-3">
-                                <AlertCircleIcon className="mr-2 h-5 w-5" />
+                            <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+                                <AlertCircleIcon className="h-5 w-5 flex-shrink-0" />
                                 <p className="font-medium">This event has been canceled</p>
                             </div>
                         )}
 
                         {/* Event Image */}
-                        <div className="relative aspect-video w-full overflow-hidden rounded-lg border">
+                        <div className="relative aspect-video w-full overflow-hidden rounded-xl border bg-gray-100">
                             <img
                                 src={event.image || '/placeholder.svg?height=400&width=800'}
                                 alt={event.name}
                                 className="h-full w-full object-cover"
+                                loading="lazy"
                             />
                         </div>
 
                         {/* Event Details Tabs */}
                         <Tabs defaultValue="details" className="w-full">
-                            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-3">
-                                <TabsTrigger value="details">Details</TabsTrigger>
+                            <TabsList className="grid w-full grid-cols-3">
+                                <TabsTrigger value="details">About</TabsTrigger>
                                 <TabsTrigger value="location">Location</TabsTrigger>
                                 <TabsTrigger value="organizer">Organizer</TabsTrigger>
                             </TabsList>
 
-                            <TabsContent value="details" className="space-y-4 pt-4">
+                            <TabsContent value="details" className="space-y-4 pt-6">
                                 <h2 className="text-2xl font-bold">About This Event</h2>
-                                <p className="whitespace-pre-line">{event.description}</p>
+                                <div className="prose prose-gray max-w-none">
+                                    <p className="whitespace-pre-line">{event.description}</p>
+                                </div>
                             </TabsContent>
 
                             <TabsContent value="location" className="space-y-4 pt-4">
@@ -91,95 +98,92 @@ export default function Show({ event }: { event: Event }) {
                         </Tabs>
                     </div>
 
-                    {/* Sidebar - 1/3 width on desktop */}
+                    {/* Sidebar */}
                     <div className="space-y-6">
-                        {/* Event Summary Card */}
-                        <Card>
-                            <CardContent className="pt-6">
-                                <h1 className="mb-2 text-2xl font-bold">{event.name}</h1>
+                        <div className="sticky top-6">
+                            {/* Event Summary Card */}
+                            <Card>
+                                <CardContent className="pt-6">
+                                    <h1 className="mb-4 text-2xl font-bold">{event.name}</h1>
 
-                                <div className="space-y-4">
-                                    {/* Date and Time */}
-                                    <div className="flex items-start">
-                                        <CalendarIcon className="text-muted-foreground mt-0.5 mr-2 h-5 w-5" />
-                                        <div>
-                                            <p className="font-medium">Date and Time</p>
-                                            <p className="text-muted-foreground">{event.humanDate}</p>
+                                    <div className="space-y-6">
+                                        {/* Info Items */}
+                                        <div className="space-y-4 rounded-lg bg-gray-50 p-4">
+                                            <div className="flex items-start gap-3">
+                                                <CalendarIcon className="mt-1 h-5 w-5 text-gray-500" />
+                                                <div>
+                                                    <p className="font-medium text-gray-900">Date and Time</p>
+                                                    <p className="text-gray-600">{event.humanDate}</p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-start gap-3">
+                                                <MapPinIcon className="mt-1 h-5 w-5 text-gray-500" />
+                                                <div>
+                                                    <p className="font-medium text-gray-900">Location</p>
+                                                    <p className="text-gray-600">{event.location}</p>
+                                                </div>
+                                            </div>
+
+                                            {!event.is_past_event && (
+                                                <div className="flex items-center justify-between border-t border-gray-200 pt-4">
+                                                    <p className="font-medium text-gray-900">Price per ticket</p>
+                                                    <p className="text-xl font-bold text-gray-900">
+                                                        {event.is_canceled ? (
+                                                            <span className="text-sm text-red-600">Canceled</span>
+                                                        ) : (
+                                                            `$${event.price.toFixed(2)}`
+                                                        )}
+                                                    </p>
+                                                </div>
+                                            )}
                                         </div>
-                                    </div>
 
-                                    {/* Location */}
-                                    <div className="flex items-start">
-                                        <MapPinIcon className="text-muted-foreground mt-0.5 mr-2 h-5 w-5" />
-                                        <div>
-                                            <p className="font-medium">Location</p>
-                                            <p className="text-muted-foreground">{event.location}</p>
-                                        </div>
-                                    </div>
-
-                                    {/* Price */}
-                                    {!event.is_past_event && (
-                                        <div className="flex items-center">
-                                            <div className="font-medium">Price:</div>
-                                            <div className="ml-auto text-xl font-bold">
-                                                {event.is_canceled ? (
-                                                    <span className="text-sm text-red-600">Canceled</span>
-                                                ) : (
-                                                    `$${event.price.toFixed(2)}`
+                                        {/* Availability */}
+                                        {!event.is_past_event && !event.is_canceled && (
+                                            <div className="flex items-center justify-between rounded-lg border border-gray-200 p-4">
+                                                <div className="flex items-center gap-2">
+                                                    <TicketIcon className="h-5 w-5 text-gray-500" />
+                                                    <span className="font-medium text-gray-900">
+                                                        {event.total_tickets - event.purchased_count} tickets left
+                                                    </span>
+                                                </div>
+                                                {event.active_offers > 0 && (
+                                                    <span className="rounded-full bg-amber-50 px-3 py-1 text-sm font-medium text-amber-600 ring-1 ring-amber-200">
+                                                        {event.active_offers} in queue
+                                                    </span>
                                                 )}
                                             </div>
-                                        </div>
-                                    )}
-
-                                    {/* Availability */}
-                                    <div className="flex items-center">
-                                        <TicketIcon className="text-muted-foreground mr-2 h-5 w-5" />
-
-                                        {/* Check if event is not past and not canceled */}
-                                        {!event.is_past_event && !event.is_canceled && (
-                                            <p>
-                                                {event.total_tickets - event.purchased_count} / {event.total_tickets} available
-                                            </p>
                                         )}
 
-                                        {/* Check for active offers */}
-                                        {!event.is_past_event && event.active_offers > 0 && (
-                                            <p className="text-muted-foreground font-medium">
-                                                <span className="ml-2 text-xs text-amber-600">
-                                                    ({event.active_offers} trying to buy)
-                                                </span>
-                                            </p>
-                                        )}
-                                    </div>
+                                        <Separator />
 
-                                    <Separator />
-
-                                    {/* Ticket Purchase */}
-                                    <JoinQueue event={event} />
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        {/* Share Card */}
-
-                        {!event.is_canceled && !event.is_past_event && (
-                            <Card>
-                                <CardContent>
-                                    <h3 className="mb-4 font-medium">Share this event</h3>
-                                    <div className="flex space-x-2">
-                                        <Button variant="outline" size="sm" className="flex-1">
-                                            Facebook
-                                        </Button>
-                                        <Button variant="outline" size="sm" className="flex-1">
-                                            Twitter
-                                        </Button>
-                                        <Button variant="outline" size="sm" className="flex-1">
-                                            Email
-                                        </Button>
+                                        {/* Ticket Purchase */}
+                                        <JoinQueue event={event} />
                                     </div>
                                 </CardContent>
                             </Card>
-                        )}
+
+                            {/* Share Card */}
+                            {!event.is_canceled && !event.is_past_event && (
+                                <Card className="mt-6">
+                                    <CardContent className="pt-6">
+                                        <h3 className="mb-4 font-medium">Share this event</h3>
+                                        <div className="grid grid-cols-3 gap-3">
+                                            <Button variant="outline" size="sm" className="w-full">
+                                                Facebook
+                                            </Button>
+                                            <Button variant="outline" size="sm" className="w-full">
+                                                Twitter
+                                            </Button>
+                                            <Button variant="outline" size="sm" className="w-full">
+                                                Email
+                                            </Button>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>

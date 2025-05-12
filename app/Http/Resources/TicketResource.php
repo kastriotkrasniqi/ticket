@@ -24,8 +24,7 @@ class TicketResource extends JsonResource
             'amount' => $this->amount,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            // 'event' => new EventResource($this->whenLoaded('event')),
-            // 'user' => new UserResource($this->whenLoaded('user')),
+            'event' => new EventResource($this->whenLoaded('event')),
             // 'is_user_ticket' => $this->whenLoaded('isUserTicket', function () {
             //     return $this->isUserTicket();
             // }),

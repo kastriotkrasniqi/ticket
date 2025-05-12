@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use Inertia\Inertia;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Http\Resources\TicketResource;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class TicketController extends Controller
 {
@@ -12,7 +16,11 @@ class TicketController extends Controller
      */
     public function index()
     {
-        //
+        $tickets = Ticket::with('event')->paginate(10);
+
+        return Inertia::render('Tickets/Index', [
+            'tickets' => TicketResource::collection($tickets),
+        ]);
     }
 
     /**
@@ -54,5 +62,20 @@ class TicketController extends Controller
             ->where('event_id', $request->event_id)->first();
 
         return response()->json($ticket);
+    }
+
+
+    public function downloadTicket($id)
+    {
+        $ticket = Ticket::where('id',$id)->firstOrFail();
+            // Generate QR code as base64 PNG
+            $qrCode = QrCode::format('png')->size(150)->generate($ticket->id);
+
+        $pdf = Pdf::loadView('pdf.ticket', [
+            'ticket' => $ticket,
+            'qrCode' => $qrCode,
+        ]);
+
+        return $pdf->download("ticket-{$ticket->id}.pdf");
     }
 }
