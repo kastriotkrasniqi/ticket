@@ -7,12 +7,13 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/client/app-layout';
 import { cn } from '@/lib/utils';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { CalendarIcon, ImageIcon, Loader2Icon } from 'lucide-react';
 import { useEffect, useState, type FormEvent , useRef } from 'react';
 import { LocationInput } from '@/components/ui/location-input';
 import { Event } from '@/types';
+import { Progress  } from '@/components/ui/progress';
 
 
 export default function EventForm({ event, stripeReady }: { event?: Event; stripeReady?: any }) {
@@ -21,9 +22,7 @@ export default function EventForm({ event, stripeReady }: { event?: Event; strip
 
 
 
-
-
-    const { data, setData, post, put, processing, errors, reset } = useForm({
+    const { data, setData, post, put, processing, errors, reset, progress } = useForm({
         name: event?.name || '',
         description: event?.description || '',
         location: event?.location || '',
@@ -33,10 +32,11 @@ export default function EventForm({ event, stripeReady }: { event?: Event; strip
         price: event?.price || '',
         total_tickets: event?.total_tickets || '',
         image: event?.image || null,
-
+        _method: event ? 'PUT' : 'POST',
     });
 
-    console.log(event?.image);
+
+
     useEffect(() => {
         if (event?.date) {
             const parsed = new Date(event.date);
@@ -50,26 +50,11 @@ export default function EventForm({ event, stripeReady }: { event?: Event; strip
         }
     }, [event]);
 
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0] || null;
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+        const file = e.target.files?.[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                setData('image', e.target?.result as string);
-            };
-            reader.readAsDataURL(file);
-        } else {
-            setData('image', null);
-        }
-
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                setImagePreview(e.target?.result as string);
-            };
-            reader.readAsDataURL(file);
-        } else {
-            setImagePreview(null);
+            setData('image', file);
+            setImagePreview(URL.createObjectURL(file));
         }
     };
 
@@ -87,10 +72,10 @@ export default function EventForm({ event, stripeReady }: { event?: Event; strip
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
 
-        const method = event ? put : post;
+        // const method = event ? put : post;
         const url = event ? route('events.update', event.id) : route('events.store');
 
-        method(url, {
+        router.post(url,data, {
             onSuccess: () => {
                 if (!event) {
                     reset();
@@ -121,7 +106,7 @@ export default function EventForm({ event, stripeReady }: { event?: Event; strip
 
     return (
         <AppLayout>
-            <Head title={event ? 'Edit Event' : 'Create Event'} />
+            <Head title={event ? event?.name : 'Create Event'} />
 
             <div className="mx-auto max-w-6xl px-8 py-6 md:py-10">
                 <div className="mb-6">
@@ -147,7 +132,7 @@ export default function EventForm({ event, stripeReady }: { event?: Event; strip
                                         <Input
                                             id="name"
                                             value={data.name}
-                                            onChange={(e) => setData('name', e.target.value)}
+                                            onChange={(e) => setData('name', e.target.value )}
                                             placeholder="Enter event name"
                                             className={errors.name ? 'border-destructive' : ''}
                                         />
@@ -287,10 +272,15 @@ export default function EventForm({ event, stripeReady }: { event?: Event; strip
                                                 type="file"
                                                 id="image"
                                                 accept="image/*"
-                                                onChange={handleImageChange}
+                                                onChange={handleFileChange}
                                                 className="absolute inset-0 cursor-pointer opacity-0"
                                             />
                                         </div>
+                                        {progress && (
+                                            <Progress className="mt-2" value={progress.percentage}>
+                                                {progress.percentage}%
+                                            </Progress>
+                                        )}
                                         {errors.image && <p className="text-destructive mt-2 text-xs">{errors.image}</p>}
                                     </div>
                                 </CardContent>
@@ -298,7 +288,7 @@ export default function EventForm({ event, stripeReady }: { event?: Event; strip
 
                             {/* Submit Button */}
                             <Card>
-                                <CardContent className="pt-6">
+                                <CardContent className="">
                                     <Button type="submit" className="w-full" disabled={processing}>
                                         {processing ? (
                                             <>

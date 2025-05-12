@@ -39,12 +39,12 @@ class EventController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'required|string',
             'location' => 'required|string|max:255',
-            'lat' => 'required|numeric',
-            'lng' => 'required|numeric',
+            // 'lat' => 'required|numeric',
+            // 'lng' => 'required|numeric',
             'date' => 'required|date',
             'price' => 'required|numeric|min:0',
             'total_tickets' => 'required|integer|min:1',
-            'image' => 'required|image|max:2048',
+            'image' => 'required|max:2048',
         ]);
 
         if ($request->hasFile('image')) {
@@ -69,10 +69,14 @@ class EventController extends Controller
         ]);
     }
 
-    public function edit(Event $event,)
+    public function edit(Event $event,StripeConnectService $stripe)
     {
+        $acc = $stripe->getAccount(auth()->user()->stripe_id);
+        $stripeReady = $acc && $acc->charges_enabled && $acc->payouts_enabled;
+
         return Inertia::render('Events/Create', [
             'event' => new EventResource($event),
+            'stripeReady' => $stripeReady
         ]);
     }
 
@@ -102,7 +106,7 @@ class EventController extends Controller
             'date' => 'required|date',
             'price' => 'required|numeric|min:0',
             'total_tickets' => 'required|integer|min:1',
-            // 'image' => 'nullable|image|max:2048', // Uncomment if you want to validate a new image
+            'image' => 'nullable|max:2048',
         ]);
 
         if ($request->hasFile('image')) {

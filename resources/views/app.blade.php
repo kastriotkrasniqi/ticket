@@ -18,7 +18,7 @@
                 }
             })();
         </script>
-        <script src="https://maps.googleapis.com/maps/api/js?key={{ config('google.maps.key') }}&libraries=places" async defer></script>
+        <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps.key') }}&libraries=places" async defer></script>
 
         {{-- Inline style to set the HTML background color based on our theme in app.css --}}
         <style>

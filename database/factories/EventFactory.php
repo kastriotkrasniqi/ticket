@@ -24,7 +24,7 @@ class EventFactory extends Factory
             'price' => fake()->randomFloat(2, 0, 100),
             'total_tickets' => fake()->numberBetween(1, 100),
             'user_id' => fake()->numberBetween(1, 10),
-            'image' => fake()->imageUrl(),
+            'image' => 'https://placehold.co/600',
             'is_canceled' => fake()->boolean(),
         ];
     }
