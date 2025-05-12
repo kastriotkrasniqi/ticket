@@ -37,11 +37,10 @@ export default function Show({ event }: { event: Event }) {
             </Head>
 
             <div className="mx-auto px-4 py-8 sm:px-6 lg:px-8">
-                {/* Back Button */}
-                <Button variant="ghost" className="mb-6 -ml-2 text-gray-600 hover:text-gray-900" onClick={() => router.get(route('events.index'))}>
+                {/* <Button variant="ghost" className="mb-6 -ml-2 text-gray-600 hover:text-gray-900" onClick={() => router.get(route('events.index'))}>
                     <ArrowLeftIcon className="mr-2 h-4 w-4" />
                     Back to events
-                </Button>
+                </Button> */}
 
                 <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
                     {/* Main Content */}
@@ -59,7 +58,7 @@ export default function Show({ event }: { event: Event }) {
                             <img
                                 src={event.image || '/placeholder.svg?height=400&width=800'}
                                 alt={event.name}
-                                className="h-full w-full object-cover"
+                                className="h-full w-full object-center"
                                 loading="lazy"
                             />
                         </div>

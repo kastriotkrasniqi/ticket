@@ -352,7 +352,7 @@ function TicketCard({
             <img
               src={ticket.event?.image || "/placeholder.svg?height=200&width=400"}
               alt={ticket.event?.name || "Event"}
-              className="absolute inset-0 h-full w-full object-cover"
+              className="absolute inset-0 h-full w-full object-contain object-center"
             />
           </div>
 

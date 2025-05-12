@@ -9,7 +9,7 @@ import AppLayout from '@/layouts/client/app-layout';
 import { cn } from '@/lib/utils';
 import { Head, router, useForm } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { CalendarIcon, ImageIcon, Loader2Icon } from 'lucide-react';
+import { ArrowLeftIcon, CalendarIcon, ImageIcon, Loader2Icon } from 'lucide-react';
 import { useEffect, useState, type FormEvent , useRef } from 'react';
 import { LocationInput } from '@/components/ui/location-input';
 import { Event } from '@/types';
@@ -109,6 +109,7 @@ export default function EventForm({ event, stripeReady }: { event?: Event; strip
             <Head title={event ? event?.name : 'Create Event'} />
 
             <div className="mx-auto max-w-6xl px-8 py-6 md:py-10">
+
                 <div className="mb-6">
                     <h1 className="text-2xl font-bold md:text-3xl">{event ? 'Edit Event' : 'Create New Event'}</h1>
                     <p className="text-muted-foreground mt-2">
@@ -260,7 +261,7 @@ export default function EventForm({ event, stripeReady }: { event?: Event; strip
                                             )}
                                         >
                                             {imagePreview ? (
-                                                <img src={imagePreview} alt="Event preview" className="h-full w-full object-cover" />
+                                                <img src={imagePreview} alt="Event preview" className="h-full w-full object-fill" />
                                             ) : (
                                                 <div className="flex h-full flex-col items-center justify-center p-4 text-center">
                                                     <ImageIcon className="text-muted-foreground mb-2 h-8 w-8" />

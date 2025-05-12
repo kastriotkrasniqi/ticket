@@ -80,8 +80,8 @@ export function EventCard({ event }: { event: Event }) {
                 }`}
             >
                 {/* Event Image */}
-                <div className="relative h-48 w-full">
-                    <img src={imageUrl} alt={`${event.name} event cover`} className="h-full w-full object-cover" loading="lazy" />
+                <div className="relative h-48 w-full  transition-transform duration-300 ease-in-out hover:scale-99">
+                    <img src={imageUrl} alt={`${event.name} event cover`} className="h-full w-full  object-contain object-center " loading="lazy" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                     <div className="absolute right-4 bottom-4 left-4">
                         <h2 className="line-clamp-2 text-xl font-semibold text-white">{event.name}</h2>
@@ -144,7 +144,7 @@ export function EventCard({ event }: { event: Event }) {
                     {event.is_owner && (
                         <Link
                             href={`/events/${event.id}/edit`}
-                            className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 p-3"
+                            className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 p-3"
                         >
                             <div className="flex items-center">
                                 <Edit className="mr-2 h-5 w-5 text-gray-500" />
