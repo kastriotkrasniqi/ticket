@@ -1,4 +1,5 @@
 import { JoinQueue } from '@/components/client/JoinQueue';
+import MapView from '@/components/client/MapView';
 import Spinner from '@/components/client/Spinner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -75,10 +76,7 @@ export default function Show({ event }: { event: Event }) {
                                 <div className="space-y-2">
                                     <p className="font-medium">{event.location}</p>
                                     <div className="aspect-video w-full overflow-hidden rounded-md border">
-                                        {/* Placeholder for map - in a real app, you'd integrate Google Maps or similar */}
-                                        <div className="bg-muted flex h-full w-full items-center justify-center">
-                                            <p className="text-muted-foreground">Map view would be displayed here</p>
-                                        </div>
+                                       <MapView lat={40.7128} lng={74.0060} label="Random Location" />
                                     </div>
                                 </div>
                             </TabsContent>
@@ -167,7 +165,7 @@ export default function Show({ event }: { event: Event }) {
                             {/* Share Card */}
                             {!event.is_canceled && !event.is_past_event && (
                                 <Card className="mt-6">
-                                    <CardContent className="pt-6">
+                                    <CardContent>
                                         <h3 className="mb-4 font-medium">Share this event</h3>
                                         <div className="grid grid-cols-3 gap-3">
                                             <Button variant="outline" size="sm" className="w-full">

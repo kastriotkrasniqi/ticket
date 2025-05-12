@@ -49,6 +49,8 @@ export interface User {
     name: string
     description: string
     location: string
+    lat: number
+    lng: number
     date: string
     humanDate: string
     price: number

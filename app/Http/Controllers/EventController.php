@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\EventResource;
-use App\Models\Event;
-use App\Services\SearchService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use App\Models\Event;
+use Illuminate\Http\Request;
+use App\Services\SearchService;
+use App\Http\Resources\EventResource;
+use App\Services\StripeConnectService;
+use Illuminate\Support\Facades\Storage;
 
 class EventController extends Controller
 {
@@ -38,6 +39,8 @@ class EventController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'required|string',
             'location' => 'required|string|max:255',
+            'lat' => 'required|numeric',
+            'lng' => 'required|numeric',
             'date' => 'required|date',
             'price' => 'required|numeric|min:0',
             'total_tickets' => 'required|integer|min:1',
@@ -57,12 +60,16 @@ class EventController extends Controller
             ->with('success', 'Event created successfully!');
     }
 
-    public function create()
+    public function create(StripeConnectService $stripe)
     {
-        return Inertia::render('Events/Create');
+        $acc = $stripe->getAccount(auth()->user()->stripe_id);
+        $stripeReady = $acc && $acc->charges_enabled && $acc->payouts_enabled;
+
+        return Inertia::render('Events/Create',['stripeReady' => $stripeReady
+        ]);
     }
 
-    public function edit(Event $event)
+    public function edit(Event $event,)
     {
         return Inertia::render('Events/Create', [
             'event' => new EventResource($event),

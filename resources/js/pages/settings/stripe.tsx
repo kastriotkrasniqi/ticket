@@ -157,9 +157,19 @@ export default function StripeSetup({ isConnected = false, stripeAccount }: Stri
                                         </svg>
                                         Stripe Account
                                     </CardTitle>
-                                    <StatusBadge status="active">Connected</StatusBadge>
+
                                 </div>
-                                <CardDescription>Your Stripe account is connected and ready to process payments</CardDescription>
+                                <CardDescription>
+                                    {stripeAccount?.payouts_enabled && stripeAccount?.charges_enabled ? (
+                                        'Your Stripe account is connected and ready to process payments.'
+                                    ) : (
+                                        <>
+                                            You cannot receive payments without completing a Stripe account.
+                                            <br />
+                                            All ticket sales will be processed through Stripe.
+                                        </>
+                                    )}
+                                </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="rounded-lg border p-4">
@@ -184,9 +194,9 @@ export default function StripeSetup({ isConnected = false, stripeAccount }: Stri
                                                 {stripeAccount?.payouts_enabled && stripeAccount?.charges_enabled ? (
                                                     <StatusBadge status="active" />
                                                 ) : (
-                                                    <Badge variant="destructive" className="mt-1">
+                                                    <StatusBadge status="pending" className="mt-1">
                                                         Incomplete
-                                                    </Badge>
+                                                    </StatusBadge>
                                                 )}
                                             </div>
                                         </div>
@@ -195,12 +205,12 @@ export default function StripeSetup({ isConnected = false, stripeAccount }: Stri
 
                                 {stripeAccount?.requirements &&
                                     (stripeAccount.requirements.currently_due.length > 0 || stripeAccount.requirements.eventually_due.length > 0) && (
-                                        <div className="rounded-lg border  bg-white p-4">
-                                            <h3 className="mb-3 text-sm font-medium ">Required Information</h3>
+                                        <div className="rounded-lg border bg-white p-4">
+                                            <h3 className="mb-3 text-sm font-medium">Required Information</h3>
 
                                             {stripeAccount.requirements.currently_due.length > 0 && (
                                                 <div className="mb-3">
-                                                    <p className="mb-2 font-medium ">Action Required:</p>
+                                                    <p className="mb-2 font-medium">Action Required:</p>
                                                     <ul className="list-disc pl-5 text-sm text-red-600">
                                                         {stripeAccount.requirements.currently_due.map((req) => (
                                                             <li key={req}>{req.replace(/_/g, ' ')}</li>
@@ -211,7 +221,7 @@ export default function StripeSetup({ isConnected = false, stripeAccount }: Stri
 
                                             {stripeAccount.requirements.eventually_due.length > 0 && (
                                                 <div>
-                                                    <p className="mb-2 font-medium ">Eventually Needed:</p>
+                                                    <p className="mb-2 font-medium">Eventually Needed:</p>
                                                     <ul className="list-disc pl-5 text-sm text-red-600">
                                                         {stripeAccount.requirements.eventually_due.map((req) => (
                                                             <li key={req}>{req.replace(/_/g, ' ')}</li>
