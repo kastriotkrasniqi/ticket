@@ -22,15 +22,23 @@ export default function Show({ event }: { event: Event }) {
 
     return (
         <AppLayout>
-            <Head title={event.name} />
+            <Head title={event.name}>
+                <meta property="og:title" content={event.name} />
+                <meta property="og:description" content={event.description.slice(0, 150)} />
+                <meta property="og:image" content={event.image || '/placeholder.svg?height=400&width=800'} />
+                <meta property="og:url" content={`https://ticket.test/events/${event.id}`} />
+                <meta property="og:type" content="website" />
+
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content={event.name} />
+                <meta name="twitter:description" content={event.description.slice(0, 150)} />
+                <meta name="twitter:image" content={`https://ticket.test${event.image || '/placeholder.jpg'}`} />
+                <meta name="twitter:url" content={`https://ticket.test/events/${event.id}`} />
+            </Head>
 
             <div className="mx-auto px-4 py-8 sm:px-6 lg:px-8">
                 {/* Back Button */}
-                <Button
-                    variant="ghost"
-                    className="mb-6 -ml-2 text-gray-600 hover:text-gray-900"
-                    onClick={() => router.get(route('events.index'))}
-                >
+                <Button variant="ghost" className="mb-6 -ml-2 text-gray-600 hover:text-gray-900" onClick={() => router.get(route('events.index'))}>
                     <ArrowLeftIcon className="mr-2 h-4 w-4" />
                     Back to events
                 </Button>
@@ -76,7 +84,7 @@ export default function Show({ event }: { event: Event }) {
                                 <div className="space-y-2">
                                     <p className="font-medium">{event.location}</p>
                                     <div className="aspect-video w-full overflow-hidden rounded-md border">
-                                       <MapView lat={40.7128} lng={74.0060} label="Random Location" />
+                                        <MapView lat={40.7128} lng={74.006} label="Random Location" />
                                     </div>
                                 </div>
                             </TabsContent>
@@ -168,13 +176,49 @@ export default function Show({ event }: { event: Event }) {
                                     <CardContent>
                                         <h3 className="mb-4 font-medium">Share this event</h3>
                                         <div className="grid grid-cols-3 gap-3">
-                                            <Button variant="outline" size="sm" className="w-full">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="w-full"
+                                                onClick={() => {
+                                                    const shareUrl = encodeURIComponent(window.location.href);
+                                                    console.log(shareUrl);
+                                                    window.open(
+                                                        `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`,
+                                                        '_blank',
+                                                        'noopener,noreferrer,width=600,height=400',
+                                                    );
+                                                }}
+                                            >
                                                 Facebook
                                             </Button>
-                                            <Button variant="outline" size="sm" className="w-full">
+
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="w-full"
+                                                onClick={() => {
+                                                    const shareUrl = encodeURIComponent(window.location.href);
+                                                    const text = encodeURIComponent(`Check out this event: ${event.name}`);
+                                                    window.open(
+                                                        `https://twitter.com/intent/tweet?url=${shareUrl}&text=${text}`,
+                                                        '_blank',
+                                                        'noopener,noreferrer,width=600,height=400',
+                                                    );
+                                                }}
+                                            >
                                                 Twitter
                                             </Button>
-                                            <Button variant="outline" size="sm" className="w-full">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="w-full"
+                                                onClick={() => {
+                                                    const subject = encodeURIComponent(`Event: ${event.name}`);
+                                                    const body = encodeURIComponent(`Check out this event: ${window.location.href}`);
+                                                    window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
+                                                }}
+                                            >
                                                 Email
                                             </Button>
                                         </div>
