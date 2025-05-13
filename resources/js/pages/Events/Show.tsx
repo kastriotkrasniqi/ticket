@@ -58,7 +58,7 @@ export default function Show({ event }: { event: Event }) {
                             <img
                                 src={event.image || '/placeholder.svg?height=400&width=800'}
                                 alt={event.name}
-                                className="h-full w-full object-center"
+                                className="h-full w-full object-cover"
                                 loading="lazy"
                             />
                         </div>

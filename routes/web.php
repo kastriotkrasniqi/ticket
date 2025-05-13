@@ -13,6 +13,7 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
+        Log::channel('stack')->info('Dashboard');
         return Inertia::render('dashboard');
     })->name('dashboard');
 });

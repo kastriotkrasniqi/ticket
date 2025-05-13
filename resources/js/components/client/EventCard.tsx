@@ -81,7 +81,7 @@ export function EventCard({ event }: { event: Event }) {
             >
                 {/* Event Image */}
                 <div className="relative h-48 w-full  transition-transform duration-300 ease-in-out hover:scale-99">
-                    <img src={imageUrl} alt={`${event.name} event cover`} className="h-full w-full  object-contain object-center " loading="lazy" />
+                    <img src={imageUrl} alt={`${event.name} event cover`} className="h-full w-full object-cover" loading="lazy" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                     <div className="absolute right-4 bottom-4 left-4">
                         <h2 className="line-clamp-2 text-xl font-semibold text-white">{event.name}</h2>
