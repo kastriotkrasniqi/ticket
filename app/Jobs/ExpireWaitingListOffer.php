@@ -43,7 +43,7 @@ class ExpireWaitingListOffer implements ShouldQueue
 
         } catch (\Throwable $th) {
 
-            Log::channel('slack')->error('ExpireWaitingListOffer failed', [
+            Log::error('ExpireWaitingListOffer failed', [
                 'entry_id' => $this->entry->id,
                 'message' => $th->getMessage(),
                 'trace' => $th->getTraceAsString(),

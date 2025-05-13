@@ -48,6 +48,9 @@ return [
             'secret' => env('STRIPE_WEBHOOK_SECRET'),
             'tolerance' => env('STRIPE_WEBHOOK_TOLERANCE', 300),
         ],
+        'fees' => [
+            'application_percentage' => env('STRIPE_FEES_APPLICATION_PERCENTAGE', 0.01),
+        ]
     ],
 
     'google' => [

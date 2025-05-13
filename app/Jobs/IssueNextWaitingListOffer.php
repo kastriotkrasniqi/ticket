@@ -35,7 +35,7 @@ class IssueNextWaitingListOffer implements ShouldQueue
             }
         } catch (\Throwable $th) {
 
-            Log::channel('slack')->error('IssueNextWaitingListOffer failed', [
+            Log::error('IssueNextWaitingListOffer failed', [
                 'event_id' => $this->event_id,
                 'message' => $th->getMessage(),
                 'trace' => $th->getTraceAsString(),

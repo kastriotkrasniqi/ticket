@@ -45,7 +45,7 @@ class IssueOfferJob implements ShouldQueue
                 new TicketOffered($user, $this->entry->event_id, $this->entry->expires_at)
             );
         } catch (\Throwable $e) {
-            Log::channel('slack')->error('IssueOfferJob failed', [
+            Log::error('IssueOfferJob failed', [
                 'entry_id' => $this->entry->id ?? null,
                 'event_id' => $this->entry->event_id ?? null,
                 'user_id' => $this->entry->user_id ?? null,

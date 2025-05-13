@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Inertia\Inertia;
 use App\Models\Event;
+use App\Enums\TicketStatus;
 use Illuminate\Http\Request;
 use App\Services\SearchService;
 use App\Http\Resources\EventResource;
@@ -65,11 +66,12 @@ class EventController extends Controller
         $acc = $stripe->getAccount(auth()->user()->stripe_id);
         $stripeReady = $acc && $acc->charges_enabled && $acc->payouts_enabled;
 
-        return Inertia::render('Events/Create',['stripeReady' => $stripeReady
+        return Inertia::render('Events/Create', [
+            'stripeReady' => $stripeReady
         ]);
     }
 
-    public function edit(Event $event,StripeConnectService $stripe)
+    public function edit(Event $event, StripeConnectService $stripe)
     {
         $acc = $stripe->getAccount(auth()->user()->stripe_id);
         $stripeReady = $acc && $acc->charges_enabled && $acc->payouts_enabled;
@@ -133,4 +135,7 @@ class EventController extends Controller
     {
         return $searchService->search($query);
     }
+
+
+
 }

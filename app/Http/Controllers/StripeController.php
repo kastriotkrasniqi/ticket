@@ -114,4 +114,13 @@ class StripeController extends Controller
         }
         return response()->json(['status' => 'success'], 200);
     }
+
+
+    public function accountSession(StripeConnectService $stripe){
+        $client_secret = $stripe->createAccountSession(auth()->user()->stripe_id);
+
+        return response()->json([
+            'client_secret' => $client_secret
+        ]);
+    }
 }

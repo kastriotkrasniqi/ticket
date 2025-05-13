@@ -13,7 +13,6 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
-        Log::channel('stack')->info('Dashboard');
         return Inertia::render('dashboard');
     })->name('dashboard');
 });
@@ -24,6 +23,9 @@ Route::post('events/{event}/join-waiting-list', [WaitingListController::class, '
     ->name('events.join-waiting-list');
 
 Route::post('/events/{event}/release-offer', [WaitingListController::class, 'releaseOffer'])->name('events.release-offer');
+Route::get('/event-stats', function () {
+    return Inertia::render('Dashboard/PaymentStats');
+})->name('payments.stats');
 
 Route::get('/search/{query}', [EventController::class, 'search'])->name('events.search');
 
@@ -43,6 +45,8 @@ Route::prefix('/stripe')->middleware(['auth'])->group(function () {
     })->name('stripe.onboarding.refresh');
 
     Route::post('/disconnect', [StripeController::class, 'disconnect'])->name('stripe.disconnect');
+
+    Route::post('/account-session', [StripeController::class, 'accountSession'])->name('stripe.account-session');
 
 });
 
