@@ -3,15 +3,18 @@
 namespace App\Services;
 
 use Exception;
-use Stripe\StripeClient;
-use App\Models\Event;
 use Stripe\Account;
+use App\Models\Event;
+use App\Models\Ticket;
 use Stripe\AccountLink;
+use Stripe\StripeClient;
 use Stripe\Checkout\Session;
+use Illuminate\Support\Facades\Log;
 
 class StripeConnectService
 {
     protected StripeClient $client;
+
 
     public function __construct()
     {
@@ -181,4 +184,51 @@ class StripeConnectService
             return null;
         }
     }
+
+
+    public function refund(Ticket $ticket, string $stripe_account): ?object
+    {
+        try {
+            $refund = $this->client->refunds->create([
+                'payment_intent' => $ticket->payment_intent_id,
+            ], [
+                'stripe_account' => $stripe_account,
+                'idempotency_key' => 'refund_' . $ticket->id,
+            ]);
+
+            return $refund;
+        } catch (\Stripe\Exception\ApiErrorException $e) {
+            $error = $e->getError();
+            $type = $error?->type;
+            $code = $e->getHttpStatus();
+
+            match (true) {
+                $code >= 500 => throw $e,
+                $type === 'idempotency_error' => \Log::warning("Stripe idempotency error on ticket {$ticket->id}: {$e->getMessage()}"),
+                $type === 'invalid_request_error' => \Log::error("Stripe invalid request error: {$e->getMessage()}"),
+                $type === 'card_error' => \Log::warning("Card error on ticket {$ticket->id}: {$e->getMessage()}"),
+                default => \Log::error("Unhandled Stripe refund error on ticket {$ticket->id}: {$e->getMessage()}"),
+            };
+
+            return null;
+        } catch (\Exception $e) {
+            \Log::error("General error during Stripe refund for ticket {$ticket->id}: {$e->getMessage()}");
+            report($e);
+            return null;
+        }
+    }
+
+
+
+
+    public function wasRefunded(Ticket $ticket)
+    {
+        if ($ticket->refund_id === null) {
+            return false;
+        } else {
+            return $this->client->refunds->retrieve($ticket->refund_id)->status === 'succeeded';
+        }
+    }
+
+
 }

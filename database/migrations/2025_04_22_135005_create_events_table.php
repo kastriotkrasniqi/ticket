@@ -24,6 +24,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('image')->nullable();
             $table->boolean('is_canceled')->nullable();
+            $table->string('refunds_batch')->nullable();
             $table->timestamps();
         });
     }

@@ -11,4 +11,6 @@ enum TicketStatus: string
     case REFUNDED = 'refunded';
     case CANCELLED = 'cancelled';
 
+    case REFUND_FAILED = 'refund_failed';
+
 }

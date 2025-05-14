@@ -22,8 +22,18 @@ Route::resource('events', EventController::class);
 Route::post('events/{event}/join-waiting-list', [WaitingListController::class, 'joinWaitingList'])
     ->name('events.join-waiting-list');
 
+Route::get('/my-events',[EventController::class, 'myEvents'])->name('my.events');
 Route::post('/events/{event}/release-offer', [WaitingListController::class, 'releaseOffer'])->name('events.release-offer');
-Route::get('/event-stats', function () {
+
+Route::post('/events/{id}/cancel-event', [EventController::class, 'cancelEvent'])->name('event.cancel');
+
+
+Route::get('/test',function (){
+    dd(auth()->user()->stripe_id);
+});
+
+
+Route::get('/payment-stats', function () {
     return Inertia::render('Dashboard/PaymentStats');
 })->name('payments.stats');
 

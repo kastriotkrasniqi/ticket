@@ -2,11 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use Throwable;
 use Inertia\Inertia;
 use App\Models\Event;
+use App\Jobs\RefundJob;
+use Illuminate\Bus\Batch;
 use App\Enums\TicketStatus;
 use Illuminate\Http\Request;
 use App\Services\SearchService;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Log;
 use App\Http\Resources\EventResource;
 use App\Services\StripeConnectService;
 use Illuminate\Support\Facades\Storage;
@@ -136,6 +142,53 @@ class EventController extends Controller
         return $searchService->search($query);
     }
 
+
+    public function cancelEvent($id)
+    {
+        DB::transaction(function () use ($id) {
+            $event = Event::with('tickets.user')->findOrFail($id);
+
+            $jobs = $event->tickets->map(function ($ticket) use ($event) {
+                return new RefundJob($ticket, auth()->user()->stripe_id);
+            })->toArray();
+
+            $batch = Bus::batch($jobs)
+                ->name('Cancel Event ' . $event->id)
+                ->catch(function (Batch $batch, Throwable $e) use ($event) {
+                    Log::error("Batch refund for event {$event->id} failed: " . $e->getMessage());
+                    // optionally notify or flag the event as partially refunded
+                })
+                ->finally(function (Batch $batch) use ($event) {
+                    Log::info("Refund batch {$batch->id} completed for event {$event->id}");
+                })->onQueue('refunds')
+                ->dispatch();
+
+
+            $event->update([
+                'refunds_batch' => $batch->id
+            ]);
+        });
+
+        return redirect()->back();
+    }
+
+
+
+    public function refunds()
+    {
+        $events = Event::whereNotNull('refunds_batch')->get();
+        return Inertia::render('Events/Refunds', [
+            'events' => EventResource::collection($events)
+        ]);
+    }
+
+
+    public function myEvents(){
+        $events = Event::where('user_id', auth()->user()->id)->paginate(10);
+        return Inertia::render('Events/MyEvents', [
+            'events' => EventResource::collection($events)
+        ]);
+    }
 
 
 }

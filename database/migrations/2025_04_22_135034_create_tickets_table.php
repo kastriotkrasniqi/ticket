@@ -18,6 +18,7 @@ return new class extends Migration
             $table->datetime('purchased_at');
             $table->string('status'); // valid, used, refunded, cancelled
             $table->string('payment_intent_id')->nullable();
+            $table->string('refund_id')->nullable();
             $table->integer('amount')->nullable();
             $table->timestamps();
         });

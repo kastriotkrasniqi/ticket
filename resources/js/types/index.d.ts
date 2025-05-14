@@ -67,7 +67,8 @@ export interface User {
     is_owner: boolean
     user_ticket: Ticket | null
     queue_position: WaitingList | null
-    isoDate: string
+    isoDate: string,
+    status: 'upcoming' | 'ongoing' | 'past' | 'canceled' | 'draft'
   }
 
 
