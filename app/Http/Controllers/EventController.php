@@ -24,16 +24,9 @@ class EventController extends Controller
      */
     public function index(Request $request)
     {
-        $events = Event::orderBy('date', 'DESC')->paginate(10);
-
-        return Inertia::render('Events/Index', [
-            'events' => Inertia::merge(function () use ($events) {
-                sleep(2);
-
-                return EventResource::collection($events->items());
-            }),
-            'current' => $events->currentPage(),
-            'last' => $events->lastPage(),
+        $events = Event::where('user_id', auth()->user()->id)->paginate(10);
+        return Inertia::render('Events/MyEvents', [
+            'events' => EventResource::collection($events)
         ]);
     }
 
@@ -183,12 +176,7 @@ class EventController extends Controller
     }
 
 
-    public function myEvents(){
-        $events = Event::where('user_id', auth()->user()->id)->paginate(10);
-        return Inertia::render('Events/MyEvents', [
-            'events' => EventResource::collection($events)
-        ]);
-    }
+
 
 
 }
