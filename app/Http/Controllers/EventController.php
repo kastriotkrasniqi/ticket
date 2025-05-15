@@ -130,9 +130,9 @@ class EventController extends Controller
         //
     }
 
-    public function search($query, SearchService $searchService)
+    public function search(Request $request, SearchService $searchService)
     {
-        return $searchService->search($query);
+        return $searchService->search($request->keyword);
     }
 
 

@@ -156,4 +156,8 @@
     body {
         @apply bg-background text-foreground;
     }
+
+    .highlighted {
+        @apply rounded bg-yellow-300 px-1 text-black;
+    }
 }

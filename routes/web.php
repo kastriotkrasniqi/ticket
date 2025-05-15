@@ -16,16 +16,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 });
 
-Route::resource('/', HomeController::class)->only('index')->name('index', 'home');
-Route::post('/stripe/webhook', [StripeController::class, 'webhook'])->name('stripe.webhook');
-Route::get('/search/{query}', [EventController::class, 'search'])->name('events.search');
 
-Route::prefix('/events')->middleware(['auth'])->group(function () {
-    Route::resource('/', EventController::class);
-    Route::post('/{event}/join-waiting-list', [WaitingListController::class, 'joinWaitingList'])
+Route::get('/meilisearch',function (){
+  return Inertia::render('meilisearch');
+});
+
+Route::resource('/', HomeController::class)->only('index');
+Route::post('/stripe/webhook', [StripeController::class, 'webhook'])->name('stripe.webhook');
+Route::post('/search', [EventController::class, 'search'])->name('events.search');
+
+Route::middleware(['auth'])->group(function () {
+    Route::resource('/events', EventController::class);
+    Route::post('/events/{event}/join-waiting-list', [WaitingListController::class, 'joinWaitingList'])
         ->name('events.join-waiting-list');
-    Route::post('/{event}/release-offer', [WaitingListController::class, 'releaseOffer'])->name('events.release-offer');
-    Route::post('/{id}/cancel-event', [EventController::class, 'cancelEvent'])->name('event.cancel');
+    Route::post('/events/{event}/release-offer', [WaitingListController::class, 'releaseOffer'])->name('events.release-offer');
+    Route::post('/events/{id}/cancel-event', [EventController::class, 'cancelEvent'])->name('event.cancel');
 });
 
 

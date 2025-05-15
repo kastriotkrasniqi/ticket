@@ -1,11 +1,10 @@
 import { Input } from '@/components/ui/input';
 import { useDebounce } from '@/hooks/use-debounce';
+import type { Event } from '@/types';
+import { Link } from '@inertiajs/react';
 import axios from 'axios';
 import { Loader2, Search, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { Link } from "@inertiajs/react"
-import type { Event } from "@/types"
-
 
 export function SearchBar() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -55,7 +54,7 @@ export function SearchBar() {
 
             setIsSearching(true);
             try {
-                const response = await axios.get(route('events.search', { query: debouncedSearchQuery }));
+                const response = await axios.post(route('events.search', { keyword: debouncedSearchQuery }));
                 setSearchResults(response.data || []);
             } catch (error) {
                 console.error('Error searching events:', error);

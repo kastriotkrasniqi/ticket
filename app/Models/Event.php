@@ -4,15 +4,15 @@ namespace App\Models;
 
 use App\Enums\TicketStatus;
 use App\Enums\WaitingStatus;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 use Laravel\Scout\Searchable;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Event extends Model
 {
     use HasFactory;
-    // use Searchable;
+    use Searchable;
 
     protected ?int $purchasedCountCache = null;
 
@@ -37,6 +37,8 @@ class Event extends Model
             'date' => 'datetime:Y-m-d',
         ];
     }
+
+
 
     public function toSearchableArray()
     {

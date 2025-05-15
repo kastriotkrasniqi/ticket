@@ -35,8 +35,8 @@ return [
         ],
     ],
 
-    'typesense' => [
-        'enabled' => env('TYPESENSE_ENABLED', false),
+    'scout' => [
+        'enabled' => env('SCOUT_ENABLED', false),
     ],
 
 
