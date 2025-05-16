@@ -1,10 +1,10 @@
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Link } from '@inertiajs/react';
 import axios from 'axios';
 import { format } from 'date-fns';
-import { CalendarIcon, Loader2, MapPinIcon, XIcon } from 'lucide-react';
+import { CalendarIcon, Loader2, MapPinIcon } from 'lucide-react';
 import { type ChangeEvent, useEffect, useRef, useState } from 'react';
-import { useDebounce } from '@/hooks/use-debounce';
 
 interface MeiliSearchHit {
     id: string;
@@ -31,46 +31,48 @@ interface MeiliSearchResponse {
 }
 
 interface SearchDialogProps {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
     className?: string;
-    onClose: () => void;
 }
 
-const SearchDialog = ({ className = '', onClose }: SearchDialogProps) => {
+const SearchDialog = ({ open, onOpenChange, className = '' }: SearchDialogProps) => {
     const [searchValue, setSearchValue] = useState('');
     const [debouncedValue, setDebouncedValue] = useState(searchValue);
     const [searchResponse, setSearchResponse] = useState<MeiliSearchResponse | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
-    const dialogRef = useRef<HTMLDivElement>(null);
 
+    // Focus input when dialog opens
     useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (dialogRef.current && !dialogRef.current.contains(event.target as Node)) {
-                onClose();
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, [onClose]);
+        if (open) {
+            // Small delay to ensure the dialog is fully rendered
+            const timer = setTimeout(() => {
+                inputRef.current?.focus();
+            }, 100);
+            return () => clearTimeout(timer);
+        }
+    }, [open]);
 
+    // Handle ESC key (now handled by Dialog component)
     useEffect(() => {
         const handleEscKey = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') onClose();
+            if (event.key === 'Escape') onOpenChange(false);
         };
-        document.addEventListener('keydown', handleEscKey);
-        return () => document.removeEventListener('keydown', handleEscKey);
-    }, [onClose]);
+        if (open) {
+            document.addEventListener('keydown', handleEscKey);
+            return () => document.removeEventListener('keydown', handleEscKey);
+        }
+    }, [open, onOpenChange]);
 
-    useEffect(() => {
-        inputRef.current?.focus();
-    }, []);
-
+    // Debounce search input
     useEffect(() => {
         const handler = setTimeout(() => setDebouncedValue(searchValue), 300);
         return () => clearTimeout(handler);
     }, [searchValue]);
 
+    // Fetch search results
     useEffect(() => {
         if (debouncedValue.trim().length < 2) {
             setSearchResponse(null);
@@ -99,6 +101,15 @@ const SearchDialog = ({ className = '', onClose }: SearchDialogProps) => {
         fetchResults();
     }, [debouncedValue]);
 
+    // Reset search when dialog closes
+    useEffect(() => {
+        if (!open) {
+            // Optional: reset search when dialog closes
+            // setSearchValue('');
+            // setSearchResponse(null);
+        }
+    }, [open]);
+
     const formatEventDate = (dateString: string) => {
         try {
             return format(new Date(dateString), 'EEE, MMM d, yyyy • h:mm a');
@@ -110,12 +121,8 @@ const SearchDialog = ({ className = '', onClose }: SearchDialogProps) => {
     const renderHighlightedText = (html: string) => ({ __html: html });
 
     return (
-        <div className={`fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm ${className}`} onClick={onClose}>
-            <div
-                ref={dialogRef}
-                className="max-h-[85vh] w-full max-w-2xl overflow-hidden rounded-xl bg-white shadow-2xl"
-                onClick={(e) => e.stopPropagation()}
-            >
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className={`max-h-[85vh] w-full max-w-2xl overflow-hidden p-0 ${className}`} onInteractOutside={(e) => e.preventDefault()}>
                 {/* Search Input */}
                 <div className="flex items-center border-b p-4">
                     <svg
@@ -147,11 +154,11 @@ const SearchDialog = ({ className = '', onClose }: SearchDialogProps) => {
                                 setSearchValue('');
                             }}
                         >
-                            <XIcon className="h-4 w-4" />
+                            {/* <XIcon className="h-4 w-4" /> */}
                             <span className="sr-only">Clear search</span>
                         </button>
                     )}
-                    <div className="bg-muted ml-2 flex-shrink-0 rounded border px-1.5 py-0.5 text-xs font-medium">ESC</div>
+                    {/* <div className="bg-muted ml-2 flex-shrink-0 rounded border px-1.5 py-0.5 text-xs font-medium">ESC</div> */}
                 </div>
 
                 {/* Search Results */}
@@ -173,18 +180,13 @@ const SearchDialog = ({ className = '', onClose }: SearchDialogProps) => {
                             <h3 className="text-muted-foreground px-2 text-sm font-medium">
                                 {searchResponse.estimatedTotalHits} result
                                 {searchResponse.estimatedTotalHits !== 1 && 's'} found
-                                {/* {searchResponse.processingTimeMs && (
-                                    <span className="text-muted-foreground ml-1 text-xs">
-                                        in {(searchResponse.processingTimeMs / 1000).toFixed(2)}s
-                                    </span>
-                                )} */}
                             </h3>
                             {searchResponse.hits.map((event) => (
                                 <Link
                                     key={event.id}
                                     href={`/events/${event.id}`}
                                     className="hover:bg-muted flex gap-4 rounded-lg p-3 transition-colors"
-                                    onClick={onClose}
+                                    onClick={() => onOpenChange(false)}
                                 >
                                     <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md">
                                         <img src={event.image || '/placeholder.svg'} alt={event.name} className="h-full w-full object-cover" />
@@ -231,6 +233,7 @@ const SearchDialog = ({ className = '', onClose }: SearchDialogProps) => {
                                         onClick={(e) => {
                                             e.preventDefault();
                                             window.location.href = `/search?q=${encodeURIComponent(searchValue)}`;
+                                            onOpenChange(false);
                                         }}
                                     >
                                         View all results
@@ -255,7 +258,7 @@ const SearchDialog = ({ className = '', onClose }: SearchDialogProps) => {
                             </svg>
                             <h3 className="mt-4 text-lg font-medium">No results found</h3>
                             <p className="text-muted-foreground mt-1 text-sm">We couldn't find any events matching "{searchValue}"</p>
-                            <Button asChild className="mt-4">
+                            <Button asChild className="mt-4" onClick={() => onOpenChange(false)}>
                                 <Link href="/events">Browse All Events</Link>
                             </Button>
                         </div>
@@ -279,8 +282,8 @@ const SearchDialog = ({ className = '', onClose }: SearchDialogProps) => {
                         </div>
                     )}
                 </div>
-            </div>
-        </div>
+            </DialogContent>
+        </Dialog>
     );
 };
 

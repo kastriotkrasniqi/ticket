@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { type Event, SharedData } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
+import { useEcho } from '@laravel/echo-react';
 import axios from 'axios';
 import { Clock, Loader2, OctagonXIcon, XCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -19,30 +20,13 @@ export function JoinQueue({ event }: { event: Event }) {
     const expiresAt = event.queue_position?.expires_at ? event.queue_position.expires_at * 1000 : null;
     const isOfferExpired: boolean | undefined = expiresAt !== null && expiresAt !== 0 ? Date.now() > expiresAt : undefined;
 
-    useEffect(() => {
-        if (!auth?.user?.id) return;
+    const channelName = `App.Models.User.${auth.user.id}`;
+    useEcho(channelName, 'WaitingStatusUpdate', (e) => {
+        console.log(e);
+        router.reload();
+    });
 
-        const channelName = `App.Models.User.${auth.user.id}`;
-        const channel = window.Echo.private(channelName);
-
-        if (event?.queue_position?.status === 'waiting' || event?.queue_position?.status === 'offered') {
-            channel.listen('WaitingStatusUpdate', (e: any) => {
-                console.log('Received update:', e);
-                try {
-                    router.reload();
-                } catch {
-                    toast.error('Failed to refresh. Please try manually.');
-                }
-            });
-        }
-
-        return () => {
-            channel.stopListening('WaitingStatusUpdate');
-            window.Echo.leave(channelName);
-        };
-    }, [auth?.user?.id, event?.queue_position?.status]);
-
-
+    if (!auth?.user?.id) return;
 
     // Timer logic for offered ticket
     useEffect(() => {

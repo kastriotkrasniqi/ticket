@@ -1,3 +1,5 @@
+import SearchButton from '@/components/client/SearchButton';
+import SearchDialog from '@/components/client/SearchDialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,27 +14,12 @@ import { useInitials } from '@/hooks/use-initials';
 import type { SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { LogOut } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import SearchButton from './SearchButton';
-import SearchDialog from './SearchDialog';
+import { useState } from 'react';
 
 export function Header() {
     const { auth } = usePage<SharedData>().props;
     const getInitials = useInitials();
-    const [showSearch, setShowSearch] = useState(false);
-
-    // Handle keyboard shortcut for search (Cmd+K or Ctrl+K)
-    useEffect(() => {
-        const onKeyDown = (e: KeyboardEvent) => {
-            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-                e.preventDefault();
-                setShowSearch(true);
-            }
-        };
-
-        window.addEventListener('keydown', onKeyDown);
-        return () => window.removeEventListener('keydown', onKeyDown);
-    }, []);
+    const [searchOpen, setSearchOpen] = useState(false);
 
     return (
         <>
@@ -46,10 +33,8 @@ export function Header() {
 
                     {/* Search Button - Centered in the header */}
                     <div className="flex flex-1 justify-center">
-                        <SearchButton onOpen={() => setShowSearch(true)} />
+                        <SearchButton onClick={() => setSearchOpen(true)} />
                     </div>
-
-                    {/* Search Dialog */}
 
                     {auth?.user ? (
                         <div className="ml-auto flex items-center gap-2">
@@ -118,7 +103,9 @@ export function Header() {
                     )}
                 </div>
             </header>
-            {showSearch && <SearchDialog onClose={() => setShowSearch(false)} />}
+
+            {/* Search Dialog - Always rendered but controlled by open state */}
+            <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
         </>
     );
 }
