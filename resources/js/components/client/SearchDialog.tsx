@@ -192,7 +192,7 @@ const SearchDialog = ({ open, onOpenChange, className = '' }: SearchDialogProps)
                                         <img src={event.image || '/placeholder.svg'} alt={event.name} className="h-full w-full object-cover" />
                                     </div>
                                     <div className="min-w-0 flex-1">
-                                        {!!event._formatted?.name ? (
+                                        {event._formatted?.name ? (
                                             <h4
                                                 className="line-clamp-1 font-medium"
                                                 dangerouslySetInnerHTML={renderHighlightedText(event._formatted.name)}

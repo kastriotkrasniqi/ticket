@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\TicketStatus;
 use Inertia\Inertia;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
@@ -69,7 +70,7 @@ class TicketController extends Controller
     {
         $ticket = Ticket::where('id',$id)->firstOrFail();
             // Generate QR code as base64 PNG
-            $qrCode = QrCode::format('png')->size(150)->generate($ticket->id);
+            $qrCode = QrCode::format('png')->size(150)->generate(url('/tickets/'.$ticket->id.'/qr'));
 
         $pdf = Pdf::loadView('pdf.ticket', [
             'ticket' => $ticket,
@@ -77,5 +78,32 @@ class TicketController extends Controller
         ]);
 
         return $pdf->download("ticket-{$ticket->id}.pdf");
+    }
+
+
+    public function scanTicket($ticket_id)
+    {
+        $ticket = Ticket::find($ticket_id);
+        if (!$ticket) {
+            return response()->json(['error' => 'Ticket not found'], 404);
+        }
+
+        if ($ticket->status === TicketStatus::USED) {
+            return response()->json(['error' => 'Ticket already used'], 400);
+        }
+
+         if ($ticket->status === TicketStatus::REFUNDED) {
+            return response()->json(['error' => 'Ticket already refunded'], 400);
+        }
+
+        if ($ticket->status === TicketStatus::VALID) {
+            $ticket->status = TicketStatus::USED;
+            $ticket->save();
+
+            return response()->json(['message' => 'Ticket validated successfully']);
+        }
+
+        return response()->json(['error' => 'Ticket not valid'], 400);
+
     }
 }

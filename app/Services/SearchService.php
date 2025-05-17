@@ -12,25 +12,11 @@ use Illuminate\Support\Facades\Config;
 class SearchService
 {
     public function search(string $keyword): JsonResponse
-{
-    if (empty($keyword)) {
-        return response()->json([
-            'result' => [
-                'hits' => [],
-                'estimatedTotalHits' => 0,
-                'processingTimeMs' => 0,
-                'query' => $keyword,
-                'limit' => 0,
-                'offset' => 0
-            ]
-        ]);
-    }
-
-    try {
-        if (!$this->useScout()) {
+    {
+        if (empty($keyword)) {
             return response()->json([
                 'result' => [
-                    'hits' => EventResource::collection($this->defaultSearch($keyword)),
+                    'hits' => [],
                     'estimatedTotalHits' => 0,
                     'processingTimeMs' => 0,
                     'query' => $keyword,
@@ -40,16 +26,30 @@ class SearchService
             ]);
         }
 
-        $results = $this->scoutSearch($keyword);
+        try {
+            if (!$this->useScout()) {
+                return response()->json([
+                    'result' => [
+                        'hits' => EventResource::collection($this->defaultSearch($keyword)),
+                        'estimatedTotalHits' => $this->defaultSearch($keyword)->count(),
+                        'processingTimeMs' => 0,
+                        'query' => $keyword,
+                        'limit' => 0,
+                        'offset' => 0
+                    ]
+                ]);
+            }
 
-        return response()->json([
-            'result' => $results
-        ]);
-    } catch (\Throwable $th) {
-        report($th);
-        return response()->json(['error' => 'Error occurred while searching.'], 500);
+            $results = $this->scoutSearch($keyword);
+
+            return response()->json([
+                'result' => $results
+            ]);
+        } catch (\Throwable $th) {
+            report($th);
+            return response()->json(['error' => 'Error occurred while searching.'], 500);
+        }
     }
-}
 
     protected function useScout(): bool
     {
@@ -74,18 +74,4 @@ class SearchService
             ->get();
     }
 
-    protected function paginate(Collection $items, int $perPage = 10): LengthAwarePaginator
-    {
-        $page = request()->input('page', 1);
-        $offset = ($page - 1) * $perPage;
-        $paginated = $items->slice($offset, $perPage)->values();
-
-        return new LengthAwarePaginator(
-            $paginated,
-            $items->count(),
-            $perPage,
-            $page,
-            ['path' => request()->url(), 'query' => request()->query()]
-        );
-    }
 }

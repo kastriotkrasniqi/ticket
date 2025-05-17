@@ -17,9 +17,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 
-Route::get('/meilisearch',function (){
-  return Inertia::render('meilisearch');
+
+
+Route::get('/tokens/create', function (Request $request) {
+    $token = auth()->user()->createToken('scan-ticket',['scan-ticket']);
+
+    return ['token' => $token->plainTextToken];
 });
+
+
+
 
 Route::resource('/', HomeController::class)->only('index');
 Route::post('/stripe/webhook', [StripeController::class, 'webhook'])->name('stripe.webhook');
@@ -38,8 +45,8 @@ Route::get('/payment-stats', function () {
     return Inertia::render('Dashboard/PaymentStats');
 })->name('payments.stats');
 
-Route::prefix('/tickets')->middleware(['auth'])->group(function () {
-Route::resource('/', TicketController::class);
+Route::middleware(['auth'])->group(function () {
+Route::resource('/tickets', TicketController::class);
 Route::get('/tickets/{id}/pdf', [TicketController::class, 'downloadTicket'])->name('ticket.pdf');
 Route::post('/tickets/purchase-ticket', \App\Http\Controllers\PurchaseTicketController::class)->name('events.purchase-ticket');
 });

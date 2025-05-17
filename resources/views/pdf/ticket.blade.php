@@ -48,7 +48,7 @@
       <p><strong>Location:</strong> {{ $ticket->event->location }}</p>
       <p><strong>Ticket #:</strong> {{ $ticket->id }}</p>
       <p><strong>Type:</strong> Standard</p>
-      <p><strong>Price:</strong> ${{ number_format($ticket->amount, 2) / 100 }}</p>
+      {{-- <p><strong>Price:</strong> ${{ number_format($ticket->amount, 2) / 100 }}</p> --}}
       <p><strong>Status:</strong> {{ $ticket->status }}</p>
       <p><strong>Purchased:</strong> {{ $ticket->purchased_at }}</p>
     </div>

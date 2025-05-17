@@ -30,7 +30,7 @@ class WaitingListEntry extends Model
     protected function expiresAt(): Attribute
     {
         return Attribute::make(
-            get: fn (string $value): ?int => (int) $value,
+            get: fn (string|null $value): ?int => (int) $value,
             set: fn (string $value): ?int => Carbon::parse($value)->timestamp,
         );
     }

@@ -73,9 +73,6 @@ class StripeController extends Controller
     }
 
 
-
-
-
     public function webhook(Request $request)
     {
         $payload = $request->getContent();
@@ -116,7 +113,8 @@ class StripeController extends Controller
     }
 
 
-    public function accountSession(StripeConnectService $stripe){
+    public function accountSession(StripeConnectService $stripe)
+    {
         $client_secret = $stripe->createAccountSession(auth()->user()->stripe_id);
 
         return response()->json([

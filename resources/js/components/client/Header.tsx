@@ -43,7 +43,7 @@ export function Header() {
                                     <Link href={route('tickets.index')}>My Tickets</Link>
                                 </Button>
                                 <Button variant="default" asChild>
-                                    <Link href={route('events.create')}>Sell Tickets</Link>
+                                    <Link href={route('events.index')}>Sell Tickets</Link>
                                 </Button>
                             </div>
 

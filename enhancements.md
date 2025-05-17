@@ -9,11 +9,11 @@
 2. Refunds & Cancellations
 Allow event organizers to:
 
-Cancel events (notify ticket holders).
+Cancel events (notify ticket holders). ✅
 
-Issue partial or full refunds using Stripe's API.
+Issue partial or full refunds using Stripe's API. ✅
 
-Allow users to request a refund via frontend (optional logic/workflow).
+Allow users to request a refund via frontend (optional logic/workflow). | TODO
 
 3. Transferable Tickets
 Let users transfer tickets to another person/email address.
