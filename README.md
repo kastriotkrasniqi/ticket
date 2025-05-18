@@ -7,10 +7,10 @@ A full-featured ticketing marketplace where users can create, promote, and sell 
 - **Backend:** Laravel 12
 - **Frontend:** React + Inertia.js
 - **Database:** MySQL
-- **Queueing & Caching (optional):** Redis
+- **Queueing & Caching :** Laravel Queues
 - **Payments:** Stripe Connect (Express Accounts)
 - **Authentication:** Laravel Sanctum
-- **PDF Generation:** Browsershot (headless Chrome)
+- **PDF Generation:** DomPdf
 - **QR Code Generation:** Simple QrCode
 
 ---
