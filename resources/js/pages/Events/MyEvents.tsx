@@ -1,6 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { CalendarIcon, ChevronRightIcon, EditIcon, EyeIcon, PlusIcon, RotateCcw, SearchIcon, SlidersHorizontalIcon, TrashIcon, UsersIcon } from 'lucide-react';
+import { CalendarIcon, ChevronRightIcon, EditIcon, EyeIcon, PlusIcon, RotateCcw, SearchIcon, SlidersHorizontalIcon, UsersIcon } from 'lucide-react';
 import { useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
@@ -23,10 +23,8 @@ import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/client/app-layout';
-import { router, usePage } from '@inertiajs/react';
 import { Event } from '@/types';
-
-
+import { router } from '@inertiajs/react';
 
 interface MyEventsProps {
     events: {
@@ -38,7 +36,6 @@ interface MyEventsProps {
             per_page: number;
         };
     };
-
 }
 
 export default function MyEvents({ events }: MyEventsProps) {
@@ -47,8 +44,6 @@ export default function MyEvents({ events }: MyEventsProps) {
     const [sortBy, setSortBy] = useState('date-desc');
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [eventToCancel, setEventToCancel] = useState<Event | null>(null);
-
-    const { route } = usePage().props;
 
     const total_revenue = events.data.reduce((acc, event) => acc + event.price * event.purchased_count, 0);
 
@@ -68,13 +63,13 @@ export default function MyEvents({ events }: MyEventsProps) {
     const getFilteredEvents = () => {
         if (selectedTab === 'all') return filteredEvents;
 
-        if(selectedTab === 'upcoming') {
+        if (selectedTab === 'upcoming') {
             const now = new Date();
             return filteredEvents.filter((event) => new Date(event.date).getTime() > now.getTime());
-        }else if(selectedTab === 'ongoing') {
+        } else if (selectedTab === 'ongoing') {
             const now = new Date();
             return filteredEvents.filter((event) => new Date(event.date).getTime() < now.getTime());
-        }else if(selectedTab === 'past') {
+        } else if (selectedTab === 'past') {
             const now = new Date();
             return filteredEvents.filter((event) => new Date(event.date).getTime() < now.getTime());
         }
@@ -124,12 +119,16 @@ export default function MyEvents({ events }: MyEventsProps) {
 
     const handleCancelEvent = () => {
         if (eventToCancel) {
-            router.post("/events/" + eventToCancel.id + "/cancel-event", {}, {
-                onSuccess: () => {
-                    setDeleteDialogOpen(false);
-                    setEventToCancel(null);
+            router.post(
+                '/events/' + eventToCancel.id + '/cancel-event',
+                {},
+                {
+                    onSuccess: () => {
+                        setDeleteDialogOpen(false);
+                        setEventToCancel(null);
+                    },
                 },
-            });
+            );
         }
     };
 
