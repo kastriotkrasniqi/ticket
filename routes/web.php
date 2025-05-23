@@ -1,9 +1,11 @@
 <?php
 
 use Inertia\Inertia;
+use App\Models\Event;
+use App\Http\Resources\EventResource;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\EventController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\WaitingListController;
@@ -38,6 +40,15 @@ Route::middleware(['auth'])->group(function () {
         ->name('events.join-waiting-list');
     Route::post('/events/{event}/release-offer', [WaitingListController::class, 'releaseOffer'])->name('events.release-offer');
     Route::post('/events/{id}/cancel-event', [EventController::class, 'cancelEvent'])->name('event.cancel');
+});
+
+
+
+Route::get('/tanstack',function (){
+    $events = Event::paginate(5);
+    return Inertia::render('Dashboard/EventsTanstack',
+[
+    'events' => EventResource::collection($events)]);
 });
 
 
