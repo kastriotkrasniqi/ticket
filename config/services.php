@@ -43,7 +43,6 @@ return [
     'stripe' => [
         'key' => env('STRIPE_KEY'),
         'secret' => env('STRIPE_SECRET'),
-        'client_id' => env('STRIPE_CLIENT_ID'),
         'webhook' => [
             'secret' => env('STRIPE_WEBHOOK_SECRET'),
             'tolerance' => env('STRIPE_WEBHOOK_TOLERANCE', 300),
@@ -56,7 +55,10 @@ return [
     'google' => [
         'maps' => [
             'key' => env('GOOGLE_MAPS_KEY'),
-        ]
+        ],
+            'client_id' => env('GOOGLE_CLIENT_ID'),
+            'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+            'redirect' => env('GOOGLE_REDIRECT_URI', 'http://localhost:8000/auth/google/callback'),
     ]
 
 ];

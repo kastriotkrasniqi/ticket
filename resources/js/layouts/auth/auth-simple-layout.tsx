@@ -1,4 +1,3 @@
-import AppLogoIcon from '@/components/app-logo-icon';
 import { Link } from '@inertiajs/react';
 import { type PropsWithChildren } from 'react';
 
@@ -16,7 +15,12 @@ export default function AuthSimpleLayout({ children, title, description }: Props
                     <div className="flex flex-col items-center gap-4">
                         <Link href="/" className="flex flex-col items-center gap-2 font-medium">
                             <div className="mb-1 flex h-9 w-9 items-center justify-center rounded-md">
-                                <AppLogoIcon className="size-9 fill-current text-[var(--foreground)] dark:text-white" />
+                                <Link
+                                    href="/"
+                                    className="flex items-center space-x-2 rounded-lg border-3 border-black p-2 transition-colors hover:border-gray-300"
+                                >
+                                    <span className="text-xl font-bold">TicketHub</span>    
+                                </Link>
                             </div>
                             <span className="sr-only">{title}</span>
                         </Link>
