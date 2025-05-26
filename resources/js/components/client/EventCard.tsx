@@ -17,21 +17,20 @@ export function EventCard({ event }: { event: Event }) {
         const expiresAt = event.queue_position?.expires_at ? event.queue_position.expires_at * 1000 : null;
         const isOfferExpired: boolean | undefined = expiresAt !== null && expiresAt !== 0 ? Date.now() > expiresAt : undefined;
 
-
         if (isSoldOut) {
             return (
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 p-3">
                     <div className="flex items-center">
-                        <Ticket className="w-5 h-5 text-gray-400 mr-2" />
+                        <Ticket className="mr-2 h-5 w-5 text-gray-400" />
                         <span className="text-gray-600">Event is sold out</span>
                     </div>
                 </div>
             );
         }
 
-        if(isOfferExpired) {
+        if (isOfferExpired) {
             return (
-                 <div className="rounded-lg border border-amber-200 bg-amber-50 p-2 ">
+                <div className="rounded-lg border border-amber-200 bg-amber-50 p-2">
                     <p className="flex items-center gap-2 text-amber-700">
                         <span className="text-xl">🎟️</span>
                         <span className="font-medium">Ticket offer: Expired </span>
@@ -40,47 +39,41 @@ export function EventCard({ event }: { event: Event }) {
             );
         }
 
-
-
         if (queuePosition.position === 2) {
             return (
-                <div className="flex flex-col lg:flex-row items-center justify-between p-3 bg-amber-50 rounded-lg border border-amber-100">
+                <div className="flex flex-col items-center justify-between rounded-lg border border-amber-100 bg-amber-50 p-3 lg:flex-row">
                     <div className="flex items-center">
-                        <CircleArrowRight className="w-5 h-5 text-amber-500 mr-2" />
-                        <span className="text-amber-700 font-medium">
-                            You're next in line! (Queue position: {queuePosition.position})
-                        </span>
+                        <CircleArrowRight className="mr-2 h-5 w-5 text-amber-500" />
+                        <span className="font-medium text-amber-700">You're next in line! (Queue position: {queuePosition.position})</span>
                     </div>
                     <div className="flex items-center">
-                        <LoaderCircle className="w-4 h-4 mr-1 animate-spin text-amber-500" />
-                        <span className="text-amber-600 text-sm">Waiting for ticket</span>
+                        <LoaderCircle className="mr-1 h-4 w-4 animate-spin text-amber-500" />
+                        <span className="text-sm text-amber-600">Waiting for ticket</span>
                     </div>
                 </div>
             );
         }
 
         return (
-            <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-100">
+            <div className="flex items-center justify-between rounded-lg border border-blue-100 bg-blue-50 p-3">
                 <div className="flex items-center">
-                    <LoaderCircle className="w-4 h-4 mr-2 animate-spin text-blue-500" />
+                    <LoaderCircle className="mr-2 h-4 w-4 animate-spin text-blue-500" />
                     <span className="text-blue-700">Queue position</span>
                 </div>
-                <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-medium">
-                    #{queuePosition.position}
-                </span>
+                <span className="rounded-full bg-blue-100 px-3 py-1 font-medium text-blue-700">#{queuePosition.position}</span>
             </div>
         );
     };
 
     return (
-        <Link href={route('events.show', event.id)} className="group block" as="button">
+        <Link href={route('events.show', event)} className="group block" as="button">
             <div
                 className={`relative overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:shadow-lg ${
                     isPastEvent ? 'opacity-75 hover:opacity-100' : ''
                 }`}
             >
                 {/* Event Image */}
-                <div className="relative h-48 w-full  transition-transform duration-300 ease-in-out hover:scale-99">
+                <div className="relative h-48 w-full transition-transform duration-300 ease-in-out hover:scale-99">
                     <img src={imageUrl} alt={`${event.name} event cover`} className="h-full w-full object-cover" loading="lazy" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                     <div className="absolute right-4 bottom-4 left-4">
@@ -143,7 +136,7 @@ export function EventCard({ event }: { event: Event }) {
 
                     {event.is_owner && (
                         <Link
-                            href={`/events/${event.id}/edit`}
+                            href={`/events/${event}/edit`}
                             className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 p-3"
                         >
                             <div className="flex items-center">

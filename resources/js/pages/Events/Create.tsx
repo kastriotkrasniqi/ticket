@@ -3,24 +3,21 @@ import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { LocationInput } from '@/components/ui/location-input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/client/app-layout';
 import { cn } from '@/lib/utils';
+import { Event } from '@/types';
 import { Head, router, useForm } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { ArrowLeftIcon, CalendarIcon, ImageIcon, Loader2Icon } from 'lucide-react';
-import { useEffect, useState, type FormEvent , useRef } from 'react';
-import { LocationInput } from '@/components/ui/location-input';
-import { Event } from '@/types';
-import { Progress  } from '@/components/ui/progress';
-
+import { CalendarIcon, ImageIcon, Loader2Icon } from 'lucide-react';
+import { useEffect, useState, type FormEvent } from 'react';
 
 export default function EventForm({ event, stripeReady }: { event?: Event; stripeReady?: any }) {
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-
-
 
     const { data, setData, post, put, processing, errors, reset, progress } = useForm({
         name: event?.name || '',
@@ -34,8 +31,6 @@ export default function EventForm({ event, stripeReady }: { event?: Event; strip
         image: event?.image || null,
         _method: event ? 'PUT' : 'POST',
     });
-
-
 
     useEffect(() => {
         if (event?.date) {
@@ -73,9 +68,9 @@ export default function EventForm({ event, stripeReady }: { event?: Event; strip
         e.preventDefault();
 
         // const method = event ? put : post;
-        const url = event ? route('events.update', event.id) : route('events.store');
+        const url = event ? route('events.update', event) : route('events.store');
 
-        router.post(url,data, {
+        router.post(url, data, {
             onSuccess: () => {
                 if (!event) {
                     reset();
@@ -97,7 +92,7 @@ export default function EventForm({ event, stripeReady }: { event?: Event; strip
                         sales.
                     </p>
                     <a href={route('settings.stripe')} className="inline-block">
-                        <Button className='cursor-pointer'>Connect with Stripe</Button>
+                        <Button className="cursor-pointer">Connect with Stripe</Button>
                     </a>
                 </div>
             </AppLayout>
@@ -109,7 +104,6 @@ export default function EventForm({ event, stripeReady }: { event?: Event; strip
             <Head title={event ? event?.name : 'Create Event'} />
 
             <div className="mx-auto max-w-6xl px-8 py-6 md:py-10">
-
                 <div className="mb-6">
                     <h1 className="text-2xl font-bold md:text-3xl">{event ? 'Edit Event' : 'Create New Event'}</h1>
                     <p className="text-muted-foreground mt-2">
@@ -133,7 +127,7 @@ export default function EventForm({ event, stripeReady }: { event?: Event; strip
                                         <Input
                                             id="name"
                                             value={data.name}
-                                            onChange={(e) => setData('name', e.target.value )}
+                                            onChange={(e) => setData('name', e.target.value)}
                                             placeholder="Enter event name"
                                             className={errors.name ? 'border-destructive' : ''}
                                         />

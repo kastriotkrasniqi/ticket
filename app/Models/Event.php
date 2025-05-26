@@ -4,15 +4,19 @@ namespace App\Models;
 
 use App\Enums\TicketStatus;
 use App\Enums\WaitingStatus;
+use Cviebrock\EloquentSluggable\Sluggable;
 use Laravel\Scout\Searchable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\Sluggable\HasSlug;
+use Spatie\Sluggable\SlugOptions;
 
 class Event extends Model
 {
     use HasFactory;
     use Searchable;
+    use Sluggable;
 
     protected ?int $purchasedCountCache = null;
 
@@ -36,6 +40,30 @@ class Event extends Model
             'is_canceled' => 'boolean',
             'date' => 'datetime:Y-m-d',
         ];
+    }
+
+     /**
+     * Return the sluggable configuration array for this model.
+     *
+     * @return array
+     */
+    public function sluggable(): array
+    {
+        return [
+            'slug' => [
+                'source' => 'name'
+            ]
+        ];
+    }
+
+     /**
+     * Get the route key for the model.
+     *
+     * @return string
+     */
+    public function getRouteKeyName()
+    {
+        return 'slug';
     }
 
 

@@ -84,9 +84,9 @@ class EventController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(Event $event)
     {
-        $event = Event::with(['tickets', 'waitingListEntries'])->findOrFail($id);
+        $event->load(['tickets', 'waitingListEntries']);
 
         return Inertia::render('Events/Show', [
             'event' => new EventResource($event),
@@ -96,10 +96,8 @@ class EventController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $eventId)
+    public function update(Request $request,Event $event)
     {
-        $event = Event::findOrFail($eventId);
-
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',

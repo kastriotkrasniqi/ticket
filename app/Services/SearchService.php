@@ -69,6 +69,7 @@ class SearchService
     protected function defaultSearch(string $keyword): Collection
     {
         return Event::where('name', 'like', "%{$keyword}%")
+            ->orWhere('slug', 'like', "%{$keyword}%")
             ->orWhere('description', 'like', "%{$keyword}%")
             ->orWhere('location', 'like', "%{$keyword}%")
             ->get();

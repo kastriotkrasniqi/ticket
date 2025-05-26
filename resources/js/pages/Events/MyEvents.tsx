@@ -454,7 +454,7 @@ function EventCard({ event, onDelete }: { event: Event; onDelete: (event: Event)
                         <div className="mb-2 flex items-start justify-between">
                             <div>
                                 <div className="flex items-center gap-2">
-                                    <Link href={route('events.show', event.id)} className="text-lg font-bold hover:underline md:text-xl">
+                                    <Link href={route('events.show', event.slug)} className="text-lg font-bold hover:underline md:text-xl">
                                         {event.name}
                                     </Link>
                                     <div>{getStatusBadge(event.status)}</div>
@@ -490,13 +490,13 @@ function EventCard({ event, onDelete }: { event: Event; onDelete: (event: Event)
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                     <DropdownMenuItem asChild>
-                                        <Link href={route('events.show', event.id)} className="flex w-full cursor-pointer items-center">
+                                        <Link href={route('events.show', event.slug)} className="flex w-full cursor-pointer items-center">
                                             <EyeIcon className="mr-2 h-4 w-4" />
                                             View Event
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
-                                        <Link href={route('events.edit', event.id)} className="flex w-full cursor-pointer items-center">
+                                        <Link href={route('events.edit', event.slug)} className="flex w-full cursor-pointer items-center">
                                             <EditIcon className="mr-2 h-4 w-4" />
                                             Edit Event
                                         </Link>
@@ -532,13 +532,13 @@ function EventCard({ event, onDelete }: { event: Event; onDelete: (event: Event)
 
                             <div className="flex gap-2">
                                 <Button variant="outline" size="sm" asChild>
-                                    <Link href={route('events.show', event.id)}>
+                                    <Link href={route('events.show', event.slug)}>
                                         View Details
                                         <ChevronRightIcon className="ml-1 h-4 w-4" />
                                     </Link>
                                 </Button>
                                 <Button size="sm" asChild>
-                                    <Link href={route('events.edit', event.id)}>
+                                    <Link href={route('events.edit', event.slug)}>
                                         <EditIcon className="mr-1 h-4 w-4" />
                                         Edit
                                     </Link>

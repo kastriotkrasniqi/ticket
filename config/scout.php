@@ -143,7 +143,7 @@ return [
         'key' => env('MEILISEARCH_KEY'),
         'index-settings' => [
             Event::class => [
-                'filterableAttributes'=> ['name', 'description', 'location'],
+                'filterableAttributes'=> ['name', 'description', 'location','slug'],
             ],
         ],
     ],

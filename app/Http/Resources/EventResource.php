@@ -20,6 +20,7 @@ class EventResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'slug' => $this->slug,
             'description' => $this->description,
             'date' => $this->date,
             'isoDate' => Carbon::parse($this->date)->toIso8601String(),

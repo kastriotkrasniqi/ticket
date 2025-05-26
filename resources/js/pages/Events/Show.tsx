@@ -26,14 +26,14 @@ export default function Show({ event }: { event: Event }) {
                 <meta property="og:title" content={event.name} />
                 <meta property="og:description" content={event.description.slice(0, 150)} />
                 <meta property="og:image" content={event.image || '/placeholder.svg?height=400&width=800'} />
-                <meta property="og:url" content={`https://ticket.test/events/${event.id}`} />
+                <meta property="og:url" content={`https://ticket.test/events/${event.slug}`} />
                 <meta property="og:type" content="website" />
 
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content={event.name} />
                 <meta name="twitter:description" content={event.description.slice(0, 150)} />
                 <meta name="twitter:image" content={`https://ticket.test${event.image || '/placeholder.jpg'}`} />
-                <meta name="twitter:url" content={`https://ticket.test/events/${event.id}`} />
+                <meta name="twitter:url" content={`https://ticket.test/events/${event.slug}`} />
             </Head>
 
             <div className="mx-auto px-4 py-8 sm:px-6 lg:px-8">

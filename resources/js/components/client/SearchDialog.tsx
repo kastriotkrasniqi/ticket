@@ -183,8 +183,8 @@ const SearchDialog = ({ open, onOpenChange, className = '' }: SearchDialogProps)
                             </h3>
                             {searchResponse.hits.map((event) => (
                                 <Link
-                                    key={event.id}
-                                    href={`/events/${event.id}`}
+                                    key={event.slug}
+                                    href={route('events.show', event)}
                                     className="hover:bg-muted flex gap-4 rounded-lg p-3 transition-colors"
                                     onClick={() => onOpenChange(false)}
                                 >

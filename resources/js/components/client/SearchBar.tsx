@@ -101,8 +101,8 @@ export function SearchBar() {
                             <div className="text-muted-foreground px-3 py-1.5 text-xs font-medium">Search Results</div>
                             {searchResults.map((event) => (
                                 <Link
-                                    key={event.id}
-                                    href={route('events.show', event.id)}
+                                    key={event.slug}
+                                    href={route('events.show', event)}
                                     className="hover:bg-muted flex items-center px-3 py-2 transition-colors"
                                     onClick={() => setShowDropdown(false)}
                                 >

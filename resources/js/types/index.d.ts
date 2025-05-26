@@ -47,6 +47,7 @@ export interface User {
   export interface Event {
     id: string
     name: string
+    slug: string
     description: string
     location: string
     lat: number
