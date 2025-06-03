@@ -54,6 +54,8 @@ export interface User {
     lng: number
     date: string
     humanDate: string
+    endHumanDate: string
+    humanDateRange: string
     price: number
     total_tickets: number
     is_sold_out: boolean

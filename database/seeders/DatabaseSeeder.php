@@ -25,11 +25,11 @@ class DatabaseSeeder extends Seeder
         //     'user_id' => User::factory(),
         // ]);
 
-        // User::factory()->create([
-        //     'email' => 'krasniqikastriot01@gmail.com',
-        //     'password' => bcrypt('password'),
-        //     'name' => 'Krasniqi Kastriot',
-        // ]);
+        User::factory()->create([
+            'email' => 'krasniqikastriot01@gmail.com',
+            'password' => bcrypt('password'),
+            'name' => 'Krasniqi Kastriot',
+        ]);
 
     }
 }

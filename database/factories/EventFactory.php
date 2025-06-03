@@ -16,11 +16,15 @@ class EventFactory extends Factory
      */
     public function definition(): array
     {
+        $start = fake()->dateTimeBetween('now', '+1 year');
+        $end = fake()->dateTimeBetween($start, (clone $start)->modify('+3 days'));
+
         return [
             'name' => fake()->name(),
             'description' => fake()->text(),
             'location' => fake()->address(),
-            'date' => fake()->dateTimeBetween('now', '+1 year')->format('Y-m-d'),
+            'start_date' => $start->format('Y-m-d'),
+            'end_date' => $end->format('Y-m-d'),
             'price' => fake()->randomFloat(2, 0, 100),
             'total_tickets' => fake()->numberBetween(1, 100),
             'user_id' => fake()->numberBetween(1, 10),

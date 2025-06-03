@@ -16,15 +16,23 @@ class EventResource extends JsonResource
     public function toArray(Request $request): array
     {
         $user = $request->user();
+        $start = Carbon::parse($this->start_date);
+        $end = Carbon::parse($this->end_date);
+
+        $sameDay = $start->isSameDay($end);
 
         return [
             'id' => $this->id,
             'name' => $this->name,
             'slug' => $this->slug,
             'description' => $this->description,
-            'date' => $this->date,
-            'isoDate' => Carbon::parse($this->date)->toIso8601String(),
-            'humanDate' => Carbon::parse($this->date)->format('F j, Y'),
+            'date' => $this->start_date,
+            'isoDate' => Carbon::parse($this->start_date)->toIso8601String(),
+            'humanDate' => Carbon::parse($this->start_date)->format('F j, g:i A'),
+            'endHumanDate' => Carbon::parse($this->end_date)->format('F j, Y g:i A'),
+            'humanDateRange' => $sameDay
+                ? $start->format('F j, Y') . ' • ' . $start->format('g:i A') . ' – ' . $end->format('g:i A')
+                : $start->format('F j,') . ' • ' . $start->format('g:i A') . ' – ' . $end->format('F j, Y') . ' • ' . $end->format('g:i A'),
             'location' => $this->location,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
@@ -38,7 +46,7 @@ class EventResource extends JsonResource
             'purchased_count' => $this->purchasedCount(),
             'active_offers' => $this->activeOffers(),
             'is_owner' => $this->isEventOwner($user),
-            'is_past_event' => $this->date < now(),
+            'is_past_event' => $this->end_date < now(),
             'is_sold_out' => $this->isSoldOut(),
             'user_ticket' => $this->userTicket($user),
             'queue_position' => $this->queuePosition($user),

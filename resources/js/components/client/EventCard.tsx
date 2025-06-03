@@ -106,7 +106,7 @@ export function EventCard({ event }: { event: Event }) {
                         <div className="flex items-center gap-2">
                             <CalendarDays className="h-4 w-4 flex-shrink-0 text-gray-500" />
                             <span>
-                                {event.humanDate} {isPastEvent && <span className="ml-1 text-xs text-gray-500">(Ended)</span>}
+                                {event.humanDateRange} {isPastEvent && <span className="ml-1 text-xs text-gray-500">(Ended)</span>}
                             </span>
                         </div>
                         <div className="flex items-center gap-2">

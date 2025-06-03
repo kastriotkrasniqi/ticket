@@ -19,7 +19,8 @@ return new class extends Migration
             $table->string('location');
             $table->decimal('lat', 10, 7)->nullable();
             $table->decimal('lng', 10, 7)->nullable();
-            $table->date('date');
+            $table->datetime('start_date');
+            $table->datetime('end_date');
             $table->integer('price');
             $table->integer('total_tickets');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');

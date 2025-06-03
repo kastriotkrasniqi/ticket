@@ -26,7 +26,8 @@ class Event extends Model
         'name',
         'description',
         'location',
-        'date',
+        'start_date',
+        'end_date',
         'price',
         'total_tickets',
         'user_id',
@@ -38,7 +39,8 @@ class Event extends Model
     {
         return [
             'is_canceled' => 'boolean',
-            'date' => 'datetime:Y-m-d',
+            'start_date' => 'datetime',
+            'end_date' => 'datetime',
         ];
     }
 
@@ -75,7 +77,7 @@ class Event extends Model
             'name' => $this->name,
             'description' => $this->description,
             'location' => $this->location,
-            'date' => (int) $this->date->timestamp,
+            'date' => (int) $this->start_date->timestamp,
             'price' => (float) $this->price,
             'created_at' => $this->created_at->timestamp,
         ];
