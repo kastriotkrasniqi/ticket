@@ -116,3 +116,6 @@ Add invite-only access or waitlist-based unlock for specific events.
 
 14. Multi-Day or Multi-Ticket Bundles
 Let events have multiple date options or bundles like “3-day pass.”
+
+
+https://code2tutorial.com/tutorial/985f04ab-1dce-44a7-a8a0-581cbde07710/03_tickets_.md
